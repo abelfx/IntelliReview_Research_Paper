@@ -1,0 +1,54 @@
+### Upload a Paper (POST)
+POST http://localhost:3500/api/paper/upload
+Content-Type: application/json
+
+{
+  "title": "Efficient Algorithms in Graph Theory",
+  "authors": ["Alice Smith", "Bob Johnson"],
+  "year": 2024,
+  "uploadedBy": "abel@intellireview.com",
+  "catagory": "Computer Science"
+}
+
+###
+Post http://localhost:3500/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Abe",
+  "email": "abel.tefcom",
+  "password": "securePassword123",
+  "country": "Ethiopia",
+  "role": "admin",
+}
+
+###
+Post http://localhost:3500/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "abel.tefcom",
+  "password": "securePassword123"
+  
+}
+
+###
+get http://localhost:3500/api/admin/stats
+
+###
+get http://localhost:3500/api/paper/viewPapers
+
+###
+delete http://localhost:3500/api/category/deleteCategory/6821beaa1e1b3a26b3689652
+
+###
+get http://localhost:3500/api/category/getalCategory
+
+###
+POST http://localhost:3500/api/notification/createNotification
+Content-Type: application/json
+
+{
+  "title":   "Server Maintenance",
+  "message": "The server will be down for maintenance tonight at 11 PM."
+}
