@@ -1,24 +1,24 @@
 import 'package:frontend/domain/entities/Categoryentities.dart';
+import 'package:frontend/domain/repositories/Categoryrepositories.dart';
 
 class Categoryusecase {
-  final Categoryusecase categoryusecase; 
+  final Categoryrepositories categoryRepository;
 
- Categoryusecase({required this.categoryusecase});
+  Categoryusecase({required this.categoryRepository});
 
-  Future<void> createCategory(String name, String description) async {
-    return await categoryusecase.createCategory(name, description);
+  Future<void> createCategory(String name, String description) {
+    return categoryRepository.createCategory(name, description);
   }
 
-  Future<List<Categoryentities>> getallCategory() async {
-    return await categoryusecase.getallCategory();
-  }  
-
- Future<void> deleteCategory(String id) async {
-    return await categoryusecase.deleteCategory(id);
+  Future<List<Categoryentities>> getallCategory() {
+    return categoryRepository.getallCategory();
   }
 
-    Future<Categoryentities> updateCategory(
-      String id, String name, String description) async {
-    return await categoryusecase.updateCategory(id, name, description);
+  Future<void> deleteCategory(String id) {
+    return categoryRepository.deleteCategory(id);
+  }
+
+  Future<Categoryentities> updateCategory(String id, String name, String description) {
+    return categoryRepository.updateCategory(id, name, description);
   }
 }
