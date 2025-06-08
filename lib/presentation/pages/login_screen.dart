@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
-import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart'; 
+import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart';
+import 'package:go_router/go_router.dart'; 
 
 
 class LoginScreen extends ConsumerStatefulWidget {
-  final VoidCallback onBackClick;
-  final VoidCallback onSignUpClick;
-
-  const LoginScreen({
-    Key? key,
-    required this.onBackClick,
-    required this.onSignUpClick,
-  }) : super(key: key);
+  const LoginScreen({super.key}); 
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
+
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
@@ -52,27 +47,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  
   Future<void> _login(String email, String password) async {
-    final userNotifier = ref.read(userNotifierProvider.notifier);
+  final userNotifier = ref.read(userNotifierProvider.notifier);
 
-    await userNotifier.login(email, password);
-    final authStatus = ref.read(userNotifierProvider);
+  await userNotifier.login(email, password);
+  final authStatus = ref.read(userNotifierProvider);
 
+  if (mounted) {
     if (authStatus == AuthStatus.authenticated) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
-        );
-        // TODO: Navigate to home/dashboard page
-      }
+   
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login successful!')),
+      );
+
+
+      context.go('/home');
     } else if (authStatus == AuthStatus.error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed!')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed!')),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,10 +91,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
+                 /* IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: widget.onBackClick,
-                  ),
+                  ),*/
                   const SizedBox(height: 8),
                   const Center(
                     child: Text(
@@ -188,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   Center(
                     child: GestureDetector(
-                      onTap: widget.onSignUpClick,
+                     // onTap: widget.onSignUpClick,
                       child: RichText(
                         text: const TextSpan(
                           text: 'No account? ',

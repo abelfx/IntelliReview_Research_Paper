@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart';
+import 'package:go_router/go_router.dart';
+import 'package:frontend/application/providers/user_provider.dart';
 
-class SignUpScreen extends StatefulWidget {
-  final VoidCallback onBackClick;
-  final VoidCallback onLoginClick;
 
-  const SignUpScreen({
-    Key? key,
-    required this.onBackClick,
-    required this.onLoginClick,
-  }) : super(key: key);
+class SignUpScreen extends ConsumerStatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -22,7 +20,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   String? _selectedRole;
   bool _passwordVisible = false;
-  bool _isLoading = false;
 
   final List<String> _roleOptions = ['user', 'admin', 'guest'];
 
@@ -66,40 +63,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
           _passwordError == null &&
           _countryError == null &&
           _roleError == null) {
-        _submit();
+        _submit(name, email, password, country, _selectedRole!);
       }
     });
   }
 
-  Future<void> _submit() async {
-    setState(() {
-      _isLoading = true;
-    });
+  Future<void> _submit(String name, String email, String password, String country, String role) async {
+    final userNotifier = ref.read(userNotifierProvider.notifier);
 
-    await Future.delayed(const Duration(seconds: 2));
+    await userNotifier.signup(name, email, password, country, role);
+    final authStatus = ref.read(userNotifierProvider);
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (!mounted) return;
 
-    // TODO: Replace with actual signup logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sign up successful!')),
-    );
+    if (authStatus == AuthStatus.authenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign up successful!')),
+      );
+      context.go('/home');
+    } else if (authStatus == AuthStatus.error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign up failed! Please try again.')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(userNotifierProvider) == AuthStatus.loading;
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            IconButton(
-              onPressed: widget.onBackClick,
-              icon: const Icon(Icons.arrow_back),
-            ),
             const Center(
               child: Text(
                 'Create Account',
@@ -111,9 +109,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            _buildTextField("Your full name", _nameController, errorText: _nameError),
+            _buildTextField("Your full name", _nameController,
+                errorText: _nameError),
             _buildTextField("Email", _emailController,
-                errorText: _emailError, keyboardType: TextInputType.emailAddress),
+                errorText: _emailError,
+                keyboardType: TextInputType.emailAddress),
             _buildTextField("Password", _passwordController,
                 isPassword: true,
                 passwordVisible: _passwordVisible,
@@ -130,13 +130,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   style: const TextStyle(color: Colors.red),
                 ),
               ),
-            _buildTextField("Country", _countryController, errorText: _countryError),
+            _buildTextField("Country", _countryController,
+                errorText: _countryError),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : _validateAndSubmit,
+                onPressed: isLoading ? null : _validateAndSubmit,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5D5CBB),
                   shape: RoundedRectangleBorder(
@@ -144,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 child: Text(
-                  _isLoading ? 'Signing up...' : 'Continue',
+                  isLoading ? 'Signing up...' : 'Continue',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -158,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             const SizedBox(height: 8),
             Center(
               child: GestureDetector(
-                onTap: widget.onLoginClick,
+                // onTap: widget.onLoginClick,
                 child: RichText(
                   text: const TextSpan(
                     text: 'Have an account? ',
@@ -224,7 +225,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   )
                 : null,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
               borderSide: BorderSide.none,
@@ -264,7 +266,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             filled: true,
             fillColor: const Color(0xFFEDEDED),
             hintText: "Select role",
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
               borderSide: BorderSide.none,
