@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart'; 
 
-class LoginScreen extends StatefulWidget {
+
+class LoginScreen extends ConsumerStatefulWidget {
   final VoidCallback onBackClick;
   final VoidCallback onSignUpClick;
 
@@ -11,14 +15,13 @@ class LoginScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
-  bool _isLoading = false;
 
   String? _emailError;
   String? _passwordError;
@@ -50,39 +53,41 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login(String email, String password) async {
-    setState(() {
-      _isLoading = true;
-    });
+    final userNotifier = ref.read(userNotifierProvider.notifier);
 
-    //login delay
-    await Future.delayed(const Duration(seconds: 2));
+    await userNotifier.login(email, password);
+    final authStatus = ref.read(userNotifierProvider);
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    // TODO: Replace with actual login logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Login successful!')),
-    );
-
-    
+    if (authStatus == AuthStatus.authenticated) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful!')),
+        );
+        // TODO: Navigate to home/dashboard page
+      }
+    } else if (authStatus == AuthStatus.error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed!')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(userNotifierProvider) == AuthStatus.loading;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // image
             Image.asset(
               'assets/images/research_paper.png',
               width: double.infinity,
               height: 250,
               fit: BoxFit.cover,
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
@@ -92,7 +97,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     icon: const Icon(Icons.arrow_back),
                     onPressed: widget.onBackClick,
                   ),
-
                   const SizedBox(height: 8),
                   const Center(
                     child: Text(
@@ -104,17 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
 
-                  const Text(
-                    'Email',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF36454F),
-                    ),
-                  ),
+                  // Email
+                  const Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF36454F))),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
@@ -128,21 +125,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  const Text(
-                    'Password',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF36454F),
-                    ),
-                  ),
+                  // Password
+                  const Text('Password', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF36454F))),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _passwordController,
@@ -156,12 +146,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                        ),
+                        icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off),
                         onPressed: () {
                           setState(() {
                             _passwordVisible = !_passwordVisible;
@@ -173,14 +160,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 24),
 
-                  //button
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40), 
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: SizedBox(
-                      width: double.infinity, 
+                      width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _validateAndLogin,
+                        onPressed: isLoading ? null : _validateAndLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF5D5CBB),
                           foregroundColor: Colors.white,
@@ -189,25 +175,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: Text(
-                          _isLoading ? 'Logging in...' : 'Login',
-                          style: const TextStyle(
-                            fontSize: 20, 
-                            fontWeight: FontWeight.bold,
-                          ),
+                          isLoading ? 'Logging in...' : 'Login',
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 24),
-
-                  Divider(
-                    color: Colors.grey[400],
-                    thickness: 1,
-                    indent: MediaQuery.of(context).size.width * 0.1,
-                    endIndent: MediaQuery.of(context).size.width * 0.1,
-                  ),
-
+                  Divider(color: Colors.grey[400], thickness: 1, indent: 40, endIndent: 40),
                   const SizedBox(height: 8),
 
                   Center(
@@ -216,17 +192,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: RichText(
                         text: const TextSpan(
                           text: 'No account? ',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
                           children: [
                             TextSpan(
                               text: 'Sign up',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF5D5CBB),
-                              ),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5D5CBB)),
                             ),
                           ],
                         ),

@@ -1,6 +1,7 @@
 import 'package:frontend/data/datasources/Userdatasource.dart';
 import 'package:frontend/domain/entities/Userentities.dart';
 import 'package:frontend/domain/repositories/Userrepositories.dart';
+import 'package:riverpod/riverpod.dart';
 
 class Userrepositoriesimpl implements Userrepositories {
   final UserDataSource userDataSource;
@@ -26,5 +27,10 @@ class Userrepositoriesimpl implements Userrepositories {
   @override
   Future<Map<String, dynamic>> login(email, password) async {
     return await userDataSource.login(email, password);
+  }
+
+  @override
+  Future<void> logout() async {
+    return await userDataSource.logout();
   }
 }

@@ -8,4 +8,5 @@ abstract class Userrepositories {
   );
 
   Future<Map<String, dynamic>> login(String email, String password);
+  Future<void> logout();
 }
