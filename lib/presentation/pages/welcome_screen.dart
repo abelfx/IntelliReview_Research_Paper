@@ -31,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end, // Push content to bottom
+                    mainAxisAlignment: MainAxisAlignment.end, 
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -51,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 80), // Extra space above the curve of the container
+                      const SizedBox(height: 80), 
                     ],
                   ),
                 ),
@@ -99,7 +99,7 @@ class WelcomeScreen extends StatelessWidget {
                           onPressed: onLoginClick,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF5D5CBB),
-                            foregroundColor: Colors.white, // button text color
+                            foregroundColor: Colors.white,
                             minimumSize: const Size.fromHeight(50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
@@ -131,7 +131,7 @@ class WelcomeScreen extends StatelessWidget {
                           onPressed: onSignUpClick,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF5D5CBB),
-                            foregroundColor: Colors.white, // button text color
+                            foregroundColor: Colors.white, 
                             minimumSize: const Size.fromHeight(50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
