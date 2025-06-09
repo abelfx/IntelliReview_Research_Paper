@@ -32,7 +32,7 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
   void _submitComment() {
     final comment = _commentController.text.trim();
     if (comment.isNotEmpty && rating > 0) {
-      final user = ref.watch(currentUserProvider);
+      final user = ref.read(currentUserProvider);
       ref.read(reviewNotifierProvider.notifier).createReview(
             widget.paper.paperId,
             user?.id,
@@ -45,9 +45,10 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final reviews = ref.watch(reviewNotifierProvider);
+    final reviewsAsync = ref.watch(reviewNotifierProvider);
 
     return Scaffold(
       drawer: Drawer(
@@ -94,8 +95,7 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
           children: [
             ResearchPaperCard(
               title: widget.paper.title,
-              imageAsset:
-                  widget.paper.imageAsset ?? 'assets/research_paper.png',
+              imageAsset: widget.paper.imageAsset ?? 'assets/research_paper.png',
               rating: widget.paper.averageRating ?? 0,
               pdfUrl: widget.paper.pdfUrl,
               isBookmarked: false,
@@ -107,8 +107,7 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
             const SizedBox(height: 12),
             Card(
               color: const Color(0xFFa9a8db),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -128,8 +127,7 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                           onPressed: () => setState(() => rating = i + 1),
                           icon: Icon(
                             Icons.star,
-                            color:
-                                (i + 1) <= rating ? Colors.amber : Colors.white,
+                            color: (i + 1) <= rating ? Colors.amber : Colors.white,
                           ),
                         );
                       }),
@@ -139,51 +137,53 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
               ),
             ),
             const SizedBox(height: 24),
-            reviews.isEmpty
-                ? const Text("No comments yet.")
-                : Column(
-                    children: reviews.map((review) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipOval(
-                              child: Image.asset(
-                                'assets/user_placeholder.png',
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFECECFB),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(review.comment),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      "Rating: ${review.rating ?? "N/A"}",
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                    ),
-                                  ],
+            reviewsAsync.when(
+              data: (reviews) => reviews.isEmpty
+                  ? const Text("No comments yet.")
+                  : Column(
+                      children: reviews.map((review) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipOval(
+                                child: Image.network(
+                                  'https://example.com/default_avatar.png',
+                                  width: 20,
+                                  height: 20,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFECECFB),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(review.comment),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Rating: ${review.rating ?? "N/A"}",
+                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Text("Error loading comments: $err"),
+            ),
           ],
         ),
       ),

@@ -205,12 +205,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       onBookmarkClick: () =>
                                           _toggleBookmark(paper.paperId),
                                       onCommentClick: () {
-                                        onNavigate:
-                                        () {
-                                          context.go('/commenting',
-                                              extra: paper);
-                                        };
-                                      },
+                               context.go('/commenting', extra: paper);
+},
+
                                       onNavigate: () {});
                                 },
                               ),

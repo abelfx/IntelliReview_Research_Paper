@@ -122,7 +122,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       /// Standalone (non-shell) route with arguments
       GoRoute(
-        path: '/comment',
+        path: '/commenting',
         builder: (context, state) {
           final paper = state.extra as PaperModel;
           return CommentingPage(paper: paper);

@@ -21,16 +21,16 @@ class ReviewModel extends Reviewentities {
           rating: rating,
           comment: comment,
         );
+factory ReviewModel.fromJson(Map<String, dynamic> json) {
+  return ReviewModel(
+    id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
+    paperId: json['paperId']?.toString() ?? '',
+    userId: json['userId']?.toString(),
+    rating: json['rating']?.toString(),
+    comment: json['comment']?.toString() ?? '',
+  );
+}
 
-  factory ReviewModel.fromJson(Map<String, dynamic> json) {
-    return ReviewModel(
-      id: json['_id'] ?? json['id'] ?? '',
-      paperId: json['paperId'] ?? '',
-      userId: json['userId'],
-      rating: json['rating'],
-      comment: json['comment'] ?? '',
-    );
-  }
 
   Map<String, dynamic> toJson() {
     return {

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class UserDataSource {
   final String baseApi = "http://localhost:3500/api/auth";
 
-  Future<void> signup({
+  Future<Map<String, dynamic>> signup({
     required String name,
     required String email,
     required String password,
@@ -27,6 +27,7 @@ class UserDataSource {
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         print("Signup successful: ${data['user']['name']}");
+        return data;
       } else {
         final error = jsonDecode(response.body);
         throw Exception("Signup failed: ${error['error']}");
