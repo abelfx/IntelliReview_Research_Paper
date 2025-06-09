@@ -1,21 +1,34 @@
+import 'package:flutter/foundation.dart';
 import '../../domain/entities/notification_entity.dart';
 
 class NotificationModel extends NotificationEntity {
+  final String id;
+  final String title;
+  final String message;
+  final String? userId;
+  final DateTime createdAt;
+
   NotificationModel({
-    required super.id,
-    required super.title,
-    required super.message,
-    super.userId,
-    required super.createdAt,
-  });
+    required this.id,
+    required this.title,
+    required this.message,
+    this.userId,
+    required this.createdAt,
+  }) : super(
+          id: id,
+          title: title,
+          message: message,
+          userId: userId,
+          createdAt: createdAt,
+        );
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['_id'],
-      title: json['title'],
-      message: json['message'],
+      id: json['_id'] ?? json['id'] ?? "",
+      title: json['title'] ?? "",
+      message: json['message'] ?? "",
       userId: json['userId'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
     );
   }
 

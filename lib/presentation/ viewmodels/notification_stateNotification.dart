@@ -1,4 +1,5 @@
 
+import 'package:frontend/data/models/notification_model.dart';
 import 'package:frontend/domain/entities/notification_entity.dart';
 import 'package:frontend/domain/usecases/Notificationsusecase.dart';
 import 'package:riverpod/riverpod.dart';
@@ -21,7 +22,7 @@ class NotificationNotifier extends StateNotifier<AsyncValue<List<NotificationEnt
 
     state = const AsyncLoading();
     try {
-      final notifications = await notificationUseCase.getUserNotifications(_userId!);
+      final notifications = await notificationUseCase.getUserNotifications();
       state = AsyncData(notifications);
     } catch (e, st) {
       state = AsyncError(e, st);
