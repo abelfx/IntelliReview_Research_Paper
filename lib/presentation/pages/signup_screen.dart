@@ -4,9 +4,10 @@ import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/application/providers/user_provider.dart';
 
-
 class SignUpScreen extends ConsumerStatefulWidget {
-  const SignUpScreen({super.key});
+  final VoidCallback onLoginClick;
+
+  const SignUpScreen({super.key, required this.onLoginClick});
 
   @override
   ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
@@ -68,7 +69,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
   }
 
-  Future<void> _submit(String name, String email, String password, String country, String role) async {
+  Future<void> _submit(String name, String email, String password,
+      String country, String role) async {
     final userNotifier = ref.read(userNotifierProvider.notifier);
 
     await userNotifier.signup(name, email, password, country, role);
@@ -159,7 +161,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             const SizedBox(height: 8),
             Center(
               child: GestureDetector(
-                // onTap: widget.onLoginClick,
+                onTap: widget.onLoginClick,
                 child: RichText(
                   text: const TextSpan(
                     text: 'Have an account? ',

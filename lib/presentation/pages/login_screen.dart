@@ -5,7 +5,12 @@ import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final VoidCallback onSignUpClick;
+
+  const LoginScreen({
+    super.key,
+    required this.onSignUpClick,
+  });
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -197,7 +202,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                   Center(
                     child: GestureDetector(
-                      // onTap: widget.onSignUpClick,
+                      onTap: widget.onSignUpClick,
                       child: RichText(
                         text: const TextSpan(
                           text: 'No account? ',

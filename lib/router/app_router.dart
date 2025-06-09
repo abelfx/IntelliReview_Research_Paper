@@ -20,11 +20,13 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/login',
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) =>
+          LoginScreen(onSignUpClick: () => context.go('/signup')),
     ),
     GoRoute(
       path: '/signup',
-      builder: (context, state) => const SignUpScreen(),
+      builder: (context, state) =>
+          SignUpScreen(onLoginClick: () => context.go('/login')),
     ),
   ],
 );
