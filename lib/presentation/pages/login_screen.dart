@@ -2,16 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
 import 'package:frontend/presentation/%20viewmodels/UserStateNotifier.dart';
-import 'package:go_router/go_router.dart'; 
-
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key}); 
+  const LoginScreen({super.key});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
-
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
@@ -47,30 +45,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
-  
   Future<void> _login(String email, String password) async {
-  final userNotifier = ref.read(userNotifierProvider.notifier);
+    final userNotifier = ref.read(userNotifierProvider.notifier);
 
-  await userNotifier.login(email, password);
-  final authStatus = ref.read(userNotifierProvider);
+    await userNotifier.login(email, password);
+    final authStatus = ref.read(userNotifierProvider);
 
-  if (mounted) {
-    if (authStatus == AuthStatus.authenticated) {
-   
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
+    if (mounted) {
+      if (authStatus == AuthStatus.authenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful!')),
+        );
 
-
-      context.go('/home');
-    } else if (authStatus == AuthStatus.error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed!')),
-      );
+        context.go('/home');
+      } else if (authStatus == AuthStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed!')),
+        );
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 /* IconButton(
+                  /* IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: widget.onBackClick,
                   ),*/
@@ -109,7 +103,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // Email
-                  const Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF36454F))),
+                  const Text('Email',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF36454F))),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _emailController,
@@ -123,14 +121,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
                   // Password
-                  const Text('Password', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF36454F))),
+                  const Text('Password',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF36454F))),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _passwordController,
@@ -144,9 +147,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(25),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
                       suffixIcon: IconButton(
-                        icon: Icon(_passwordVisible ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(_passwordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                         onPressed: () {
                           setState(() {
                             _passwordVisible = !_passwordVisible;
@@ -174,19 +180,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         child: Text(
                           isLoading ? 'Logging in...' : 'Login',
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 24),
-                  Divider(color: Colors.grey[400], thickness: 1, indent: 40, endIndent: 40),
+                  Divider(
+                      color: Colors.grey[400],
+                      thickness: 1,
+                      indent: 40,
+                      endIndent: 40),
                   const SizedBox(height: 8),
 
                   Center(
                     child: GestureDetector(
-                     // onTap: widget.onSignUpClick,
+                      // onTap: widget.onSignUpClick,
                       child: RichText(
                         text: const TextSpan(
                           text: 'No account? ',
@@ -194,7 +205,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             TextSpan(
                               text: 'Sign up',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF5D5CBB)),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF5D5CBB)),
                             ),
                           ],
                         ),

@@ -10,7 +10,9 @@ class WelcomeScreen extends StatelessWidget {
     this.onSignUpClick = _defaultFunction,
   }) : super(key: key);
 
-  static void _defaultFunction() {}
+  static void _defaultFunction() {
+    debugPrint('No callback provided for button click.');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end, 
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -42,7 +44,6 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-
                       const SizedBox(height: 8),
                       Text(
                         'Exploring Ideas, Unveiling Insights – Your Trusted Hub for Research Discoveries!',
@@ -51,11 +52,10 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 80), 
+                      const SizedBox(height: 80),
                     ],
                   ),
                 ),
-
               ],
             ),
           ),
@@ -131,7 +131,7 @@ class WelcomeScreen extends StatelessWidget {
                           onPressed: onSignUpClick,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF5D5CBB),
-                            foregroundColor: Colors.white, 
+                            foregroundColor: Colors.white,
                             minimumSize: const Size.fromHeight(50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25),
