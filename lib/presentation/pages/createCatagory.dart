@@ -1,30 +1,42 @@
-// File: lib/ui/screens/create_category_screen.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:frontend/application/providers/category_provider.dart';
+import 'package:frontend/presentation/%20viewmodels/CategoryStateNotifier.dart'; // Ensure correct path
 
-class CreateCategoryScreen extends StatefulWidget {
+class CreateCategoryScreen extends ConsumerStatefulWidget {
   const CreateCategoryScreen({super.key});
 
   @override
-  State<CreateCategoryScreen> createState() => _CreateCategoryScreenState();
+  ConsumerState<CreateCategoryScreen> createState() => _CreateCategoryScreenState();
 }
 
-class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
+class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  void _createCategory() {
+  bool _isSubmitting = false;
+
+  Future<void> _createCategory() async {
     final name = _nameController.text.trim();
     final description = _descriptionController.text.trim();
 
-    if (name.isNotEmpty && description.isNotEmpty) {
-      // You should replace this with actual ViewModel/Bloc logic.
+    if (name.isEmpty || description.isEmpty) {
+      Fluttertoast.showToast(msg: "Please fill all fields");
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await ref.read(categoryNotifierProvider.notifier).addCategory(name, description);
       Fluttertoast.showToast(msg: "Category '$name' created!");
       _nameController.clear();
       _descriptionController.clear();
-    } else {
-      Fluttertoast.showToast(msg: "Please fill all fields");
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Error creating category: $e");
+    } finally {
+      setState(() => _isSubmitting = false);
     }
   }
 
@@ -61,11 +73,13 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -98,7 +112,7 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
           const SizedBox(height: 32),
           Center(
             child: ElevatedButton(
-              onPressed: _createCategory,
+              onPressed: _isSubmitting ? null : _createCategory,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
                 shape: RoundedRectangleBorder(
@@ -106,10 +120,14 @@ class _CreateCategoryScreenState extends State<CreateCategoryScreen> {
                 ),
                 fixedSize: const Size(150, 50),
               ),
-              child: const Text(
-                "Create",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              child: _isSubmitting
+                  ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    )
+                  : const Text(
+                      "Create",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                    ),
             ),
           )
         ],

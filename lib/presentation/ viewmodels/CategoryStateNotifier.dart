@@ -40,6 +40,15 @@ class CategoryNotifier extends StateNotifier<AsyncValue<List<Categoryentities>>>
       state = AsyncError(e, st);
     }
   }
+  Future<void> editCategory(String id, String name, String description) async {
+  try {
+    await categoryUseCase.updateCategory(id, name, description);
+    await getAllCategories();
+  } catch (e, st) {
+    state = AsyncError(e, st);
+  }
+}
+
 }
 
 final categoryNotifierProvider = StateNotifierProvider<CategoryNotifier, AsyncValue<List<Categoryentities>>>((ref) {

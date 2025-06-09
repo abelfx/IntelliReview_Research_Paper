@@ -1,4 +1,6 @@
 import 'package:frontend/presentation/pages/Hompage.dart';
+import 'package:frontend/presentation/pages/categoryview.dart';
+import 'package:frontend/presentation/pages/createCatagory.dart';
 import 'package:frontend/presentation/pages/login_screen.dart';
 import 'package:frontend/presentation/pages/signup_screen.dart';
 import 'package:frontend/presentation/pages/welcome_screen.dart';
@@ -28,5 +30,14 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) =>
           SignUpScreen(onLoginClick: () => context.go('/login')),
     ),
+     GoRoute(
+      path: '/viewcategory',
+      builder: (context, state) => const CategoryViewScreen(),
+    ),
+     GoRoute(
+      path: '/createCategory',
+      builder: (context, state) => const CreateCategoryScreen(),
+    ),
+    
   ],
 );

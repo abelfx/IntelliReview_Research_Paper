@@ -9,7 +9,7 @@ class CategoryDataSource {
 
   Future<List<Categoryentities>> getAllCategory() async {
     try {
-      final response = await http.get(Uri.parse(baseApi));
+      final response = await http.get(Uri.parse("$baseApi/getallCategory"));
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((json) => Categorymodel.fromjson(json)).toList();
@@ -43,25 +43,29 @@ class CategoryDataSource {
   }
 
 
-  Future<void> deleteCategory(String id) async {
-    try {
-      final response = await http.delete(Uri.parse('$baseApi/$id'));
-      if (response.statusCode == 200) {
-        print("Deleted successfully");
-      } else {
-        throw Exception("Failed to delete category");
-      }
-    } catch (error) {
-      print(error);
-    }
+ Future<void> deleteCategory(String id) async {
+  if (id.trim().isEmpty) {
+    throw Exception("Invalid ID: Cannot delete category with empty ID");
   }
+
+  final url = Uri.parse('$baseApi/deleteCategory/${id.trim()}');
+  final response = await http.delete(url);
+
+  if (response.statusCode == 200 || response.statusCode == 204) {
+    print("Deleted successfully");
+  } else {
+    throw Exception("Failed to delete category. Status code: ${response.statusCode}\nResponse: ${response.body}");
+  }
+}
+
+
 
   
   Future<Categoryentities> updateCategory(
       String id, String name, String description) async {
     try {
       final response = await http.put(
-        Uri.parse('$baseApi/$id'),
+        Uri.parse('$baseApi/updateCategory/$id'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': name,
