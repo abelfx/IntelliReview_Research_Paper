@@ -1,37 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/application/providers/review_provider.dart';
 
 import '../components/homeTopBar.dart';
 import '../components/ResearchPaperCard.dart';
 import '../components/BottomNavBar.dart';
 import '../components/drawer.dart';
 
-class CommentingPage extends StatefulWidget {
-  final int selectedBottomNavItem;
-  final Function(int) onBottomNavItemSelected;
+import '../../domain/entities/Reviewentities.dart';
 
-  const CommentingPage({
-    super.key,
-    this.selectedBottomNavItem = 0,
-    required this.onBottomNavItemSelected,
-  });
+
+class CommentingPage extends ConsumerStatefulWidget {
+  const CommentingPage({super.key});
 
   @override
-  State<CommentingPage> createState() => _CommentingPageState();
+  ConsumerState<CommentingPage> createState() => _CommentingPageState();
 }
 
-class _CommentingPageState extends State<CommentingPage> {
+class _CommentingPageState extends ConsumerState<CommentingPage> {
   final TextEditingController _commentController = TextEditingController();
   int rating = 0;
-  final List<String> comments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(reviewNotifierProvider.notifier).loadReviews();
+    });
+  }
+
+  void _submitComment() {
+    final comment = _commentController.text.trim();
+    if (comment.isNotEmpty && rating > 0) {
+      ref.read(reviewNotifierProvider.notifier).createReview(
+        "paper123", 
+        "user123", 
+        rating.toString(),
+        comment,
+      );
+
+      _commentController.clear();
+      setState(() {
+        rating = 0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final reviews = ref.watch(reviewNotifierProvider);
+
     return Scaffold(
       drawer: Drawer(
-        child: DrawerContent(onLogout: () {
-          // Handle logout: just close drawer for now
-          Navigator.pop(context);
-        }, onNavigate: (String route) {  },),
+        child: DrawerContent(
+          onLogout: () => Navigator.pop(context),
+          onNavigate: (String route) {},
+        ),
       ),
       appBar: HomeTopBar(
         inputName: "Comment",
@@ -40,7 +64,6 @@ class _CommentingPageState extends State<CommentingPage> {
           Navigator.pushNamed(context, '/notifications');
         },
       ),
-
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -52,16 +75,7 @@ class _CommentingPageState extends State<CommentingPage> {
                 hintText: "Write a comment...",
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.send, color: Color(0xFF5D5CBB)),
-                  onPressed: () {
-                    final comment = _commentController.text.trim();
-                    if (comment.isNotEmpty) {
-                      setState(() {
-                        comments.insert(0, comment);
-                        _commentController.clear();
-                        rating = 0; // reset rating on send
-                      });
-                    }
-                  },
+                  onPressed: _submitComment,
                 ),
                 filled: true,
                 fillColor: const Color(0xFFECECFB),
@@ -71,11 +85,6 @@ class _CommentingPageState extends State<CommentingPage> {
                 ),
               ),
             ),
-          ),
-          BottomNavBar(
-            selectedIndex: widget.selectedBottomNavItem,
-            onItemSelected: widget.onBottomNavItemSelected,
-            role: "user",
           ),
         ],
       ),
@@ -90,15 +99,9 @@ class _CommentingPageState extends State<CommentingPage> {
               rating: 4.5,
               pdfUrl: "https://example.com/sample.pdf",
               isBookmarked: false,
-              onBookmarkClick: () {
-                // Handle bookmark toggle
-              },
-              onReadClick: () {
-                // Handle PDF read
-              },
-              onNavigate: () {
-                // Navigate to detail page
-              },
+              onBookmarkClick: () {},
+              onReadClick: () {},
+              onNavigate: () {},
             ),
             const SizedBox(height: 12),
             Card(
@@ -117,11 +120,7 @@ class _CommentingPageState extends State<CommentingPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(5, (i) {
                         return IconButton(
-                          onPressed: () {
-                            setState(() {
-                              rating = i + 1;
-                            });
-                          },
+                          onPressed: () => setState(() => rating = i + 1),
                           icon: Icon(
                             Icons.star,
                             color: (i + 1) <= rating ? Colors.amber : Colors.white,
@@ -134,39 +133,49 @@ class _CommentingPageState extends State<CommentingPage> {
               ),
             ),
             const SizedBox(height: 24),
-            comments.isEmpty
+            reviews.isEmpty
                 ? const Text("No comments yet.")
                 : Column(
-              children: comments.map((comment) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          'assets/user_placeholder.png',
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
+                    children: reviews.map((review) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                'assets/user_placeholder.png',
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFECECFB),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(review.comment),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Rating: ${review.rating ?? "N/A"}",
+                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFECECFB),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(comment),
-                        ),
-                      ),
-                    ],
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
-            ),
           ],
         ),
       ),

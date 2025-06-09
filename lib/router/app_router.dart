@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/presentation/pages/commentingpage.dart';
 import 'package:frontend/presentation/pages/notification_screen.dart';
 import 'package:frontend/presentation/pages/posting.dart';
 import 'package:frontend/presentation/pages/userProfile.dart';
@@ -85,6 +86,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const CommentingPage(),
       ),
     ],
     debugLogDiagnostics: true, // Helpful for debugging routing issues
