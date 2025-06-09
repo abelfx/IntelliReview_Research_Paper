@@ -1,4 +1,4 @@
-import 'package:frontend/domain/entities/Userentities.dart';
+
 import 'package:frontend/domain/repositories/Userrepositories.dart';
 
 class Userusecase {
@@ -24,5 +24,9 @@ class Userusecase {
 
   Future<Map<String, dynamic>> login(String email, String password) {
     return userRepository.login(email, password);
+  }
+
+   Future<void> logout() {
+    return userRepository.logout();
   }
 }

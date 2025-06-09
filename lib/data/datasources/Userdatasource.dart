@@ -58,4 +58,24 @@ class UserDataSource {
       rethrow;
     }
   }
+   Future<void> logout() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseApi/logouut'),
+  
+   );
+
+      if (response.statusCode == 201) {
+
+        print("Logout successfully");
+      
+      } else {
+        final error = jsonDecode(response.body);
+        throw Exception("Logout failed: ${error['message'] ?? error['error']}");
+      }
+    } catch (error) {
+      print("Error during logout: $error");
+      rethrow;
+    }
+  }
 }
