@@ -22,7 +22,8 @@ class ResearchPaperCard extends StatelessWidget {
     required this.onReadClick,
     required this.onBookmarkClick,
     this.publishedDate = "12/05/2025",
-    this.authorName = "john Bereket", required Null Function() onNavigate,
+    this.authorName = "john Bereket",
+    required Null Function() onNavigate,
   });
 
   @override
@@ -133,14 +134,14 @@ class ResearchPaperCard extends StatelessWidget {
   }
 
   TextStyle _infoStyle() => const TextStyle(
-    fontSize: 10,
-    color: Colors.white70,
-  );
+        fontSize: 10,
+        color: Colors.white70,
+      );
 
   Widget _iconButton(BuildContext context,
       {required IconData icon,
-        required String tooltip,
-        required VoidCallback onPressed}) {
+      required String tooltip,
+      required VoidCallback onPressed}) {
     return IconButton(
       icon: Icon(icon, size: 20, color: Colors.white),
       tooltip: tooltip,

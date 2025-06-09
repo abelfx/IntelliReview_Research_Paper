@@ -22,8 +22,6 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum PaperStatus { loading, loaded, error }
-
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _searchQuery = '';
   String _selectedFilter = 'All';
@@ -77,7 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       title: p.title,
       averageRating: 0,
       pdfUrl: p.pdfUrl,
-      publishedDate: p.year > 0 ? p.year.toString() : 'Unknown',
+      publishedDate: p.year > 0 ? p.year.toString() : DateTime.now().toString(),
       authorName: p.authors.isNotEmpty ? p.authors.join(', ') : 'Unknown',
       imageAsset: 'assets/avatar_placeholder.png', // placeholder
       category: p.category,
@@ -122,13 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     bool isLoading = false;
     String? error;
 
-    if (state.status == PaperStatus.loading) {
-      isLoading = true;
-    } else if (state.status == PaperStatus.loaded) {
-      papers = state.papers.map(_toPaperModel).toList();
-    } else if (state.status == PaperStatus.error) {
-      error = state.errorMessage ?? 'Unknown error';
-    }
+    papers = state.papers.map(_toPaperModel).toList();
 
     final filteredPapers = _getFilteredSortedPapers(papers);
 
