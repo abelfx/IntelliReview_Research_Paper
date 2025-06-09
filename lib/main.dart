@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/pages/login_screen.dart';
 import 'package:frontend/presentation/pages/signup_screen.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:frontend/router/app_router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()),);
+  runApp(const ProviderScope(child: MyApp()) as Widget,);
+}
+
+class ProviderScope {
+  const ProviderScope({required MyApp child});
 }
 
 class MyApp extends StatelessWidget {

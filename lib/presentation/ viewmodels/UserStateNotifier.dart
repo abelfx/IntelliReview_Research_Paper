@@ -1,6 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:frontend/application/providers/user_provider.dart';
 import 'package:frontend/domain/usecases/Userusecase.dart';
+import 'package:riverpod/riverpod.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
