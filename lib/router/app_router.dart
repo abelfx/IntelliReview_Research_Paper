@@ -104,7 +104,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
-          GoRoute(path: '/favourites', builder: (_, __) => const HomeScreen()),
+          GoRoute(path: '/favourites', builder: (_, __) => const BookmarkScreen()),
           GoRoute(
               path: '/viewcategory',
               builder: (_, __) => const CategoryViewScreen()),

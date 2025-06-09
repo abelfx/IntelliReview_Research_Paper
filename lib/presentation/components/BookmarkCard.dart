@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../model/PaperModel.dart'; // Adjust to your actual model path
+import '../../model/PaperModel.dart';
 
 class BookmarkCard extends StatelessWidget {
   final PaperModel paper;
@@ -8,46 +8,53 @@ class BookmarkCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const BookmarkCard({
-    Key? key,
+    super.key,
     required this.paper,
     required this.isBookmarked,
     required this.onBookmarkClick,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Image.asset(
-                'assets/research_paper.png',
-                width: 48,
-                height: 48,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF5F58C9), // Purple background
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            // Placeholder for circle avatar
+            Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  paper.title ?? '',
-                  style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(width: 12),
+
+            // Title
+            Expanded(
+              child: Text(
+                paper.title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              IconButton(
-                onPressed: onBookmarkClick,
-                icon: Icon(
-                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                tooltip: isBookmarked ? 'Remove bookmark' : 'Add bookmark',
-              ),
-            ],
-          ),
+            ),
+
+            // More icon
+            const Icon(Icons.more_vert, color: Colors.white),
+          ],
         ),
       ),
     );

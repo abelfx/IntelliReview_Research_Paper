@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/presentation/%20viewmodels/bookmark_provider.dart';
 import 'package:frontend/presentation/components/app_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -43,14 +44,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _toggleBookmark(String paperId) {
-    setState(() {
-      if (_bookmarkedIds.contains(paperId)) {
-        _bookmarkedIds.remove(paperId);
-      } else {
-        _bookmarkedIds.add(paperId);
-      }
-    });
-  }
+  setState(() {
+    if (_bookmarkedIds.contains(paperId)) {
+      _bookmarkedIds.remove(paperId);
+    } else {
+      _bookmarkedIds.add(paperId);
+    }
+  });
+}
+
 
   Future<void> _openPdf(String url) async {
     if (url.isEmpty) {
@@ -85,6 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       createdAt: DateTime.tryParse("today" ?? '') ?? DateTime.now(),
     );
   }
+  
 
   List<PaperModel> _getFilteredSortedPapers(List<PaperModel> papers) {
     var filtered = papers
@@ -113,11 +116,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return filtered;
   }
+  
 
   @override
   Widget build(BuildContext context) {
+    late BookmarkNotifier bookmarkNotifier;
+
     final state = ref.watch(paperNotifierProvider);
     final notifier = ref.read(paperNotifierProvider.notifier);
+final bookmarkedPapers = ref.watch(bookmarkNotifierProvider);
+bookmarkNotifier = ref.read(bookmarkNotifierProvider.notifier);
 
     List<PaperModel> papers = [];
     bool isLoading = false;
@@ -192,6 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 itemCount: filteredPapers.length,
                                 itemBuilder: (context, index) {
                                   final paper = filteredPapers[index];
+                                   final isBookmarked = bookmarkedPapers.any((b) => b.paperId == paper.paperId);
                                   return ResearchPaperCard(
                                       title: paper.title,
                                       imageAsset: paper.imageAsset,
@@ -203,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           .contains(paper.paperId),
                                       onReadClick: () => _openPdf(paper.pdfUrl),
                                       onBookmarkClick: () =>
-                                          _toggleBookmark(paper.paperId),
+                                           ref.read(bookmarkNotifierProvider.notifier).toggleBookmark(paper),
                                       onCommentClick: () {
                                context.go('/commenting', extra: paper);
 },
