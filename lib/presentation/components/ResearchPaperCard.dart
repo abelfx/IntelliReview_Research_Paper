@@ -9,6 +9,7 @@ class ResearchPaperCard extends StatelessWidget {
   final bool isBookmarked;
   final VoidCallback onReadClick;
   final VoidCallback onBookmarkClick;
+  final VoidCallback onCommentClick;
   final String publishedDate;
   final String authorName;
 
@@ -19,6 +20,7 @@ class ResearchPaperCard extends StatelessWidget {
     required this.rating,
     required this.pdfUrl,
     required this.isBookmarked,
+    required this.onCommentClick,
     required this.onReadClick,
     required this.onBookmarkClick,
     this.publishedDate = "12/05/2025",
@@ -112,7 +114,7 @@ class ResearchPaperCard extends StatelessWidget {
                   context,
                   icon: Icons.chat_bubble_outline,
                   tooltip: "Comment",
-                  onPressed: () {},
+                  onPressed: onCommentClick,
                 ),
                 _iconButton(
                   context,

@@ -1,4 +1,5 @@
 class Userentities {
+  final String? id;
   final String name;
   final String email;
   final String password;
@@ -6,7 +7,8 @@ class Userentities {
   final String role;
 
   Userentities(
-      {required this.name,
+      {required this.id,
+        required this.name,
       required this.email,
       required this.password,
       required this.country,

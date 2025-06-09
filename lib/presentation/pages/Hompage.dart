@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/presentation/components/BottomNavBar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Import your notifier provider and entities
@@ -190,19 +192,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 itemBuilder: (context, index) {
                                   final paper = filteredPapers[index];
                                   return ResearchPaperCard(
-                                    title: paper.title,
-                                    imageAsset: paper.imageAsset,
-                                    rating: paper.averageRating,
-                                    pdfUrl: paper.pdfUrl,
-                                    publishedDate: paper.publishedDate,
-                                    authorName: paper.authorName,
-                                    isBookmarked:
-                                        _bookmarkedIds.contains(paper.paperId),
-                                    onReadClick: () => _openPdf(paper.pdfUrl),
-                                    onBookmarkClick: () =>
-                                        _toggleBookmark(paper.paperId),
-                                    onNavigate: () {},
-                                  );
+                                      title: paper.title,
+                                      imageAsset: paper.imageAsset,
+                                      rating: paper.averageRating,
+                                      pdfUrl: paper.pdfUrl,
+                                      publishedDate: paper.publishedDate,
+                                      authorName: paper.authorName,
+                                      isBookmarked: _bookmarkedIds
+                                          .contains(paper.paperId),
+                                      onReadClick: () => _openPdf(paper.pdfUrl),
+                                      onBookmarkClick: () =>
+                                          _toggleBookmark(paper.paperId),
+                                      onCommentClick: () {
+                                        onNavigate:
+                                        () {
+                                          context.go('/commenting',
+                                              extra: paper);
+                                        };
+                                      },
+                                        onNavigate:(){});
                                 },
                               ),
               ),
@@ -210,6 +218,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
+      
     );
   }
 }
