@@ -1,4 +1,5 @@
 import 'package:frontend/data/datasources/Userdatasource.dart';
+import 'package:frontend/data/models/Usermodel.dart';
 import 'package:frontend/data/repositories_impl/Userrepositoriesimpl.dart';
 import 'package:frontend/domain/usecases/Userusecase.dart';
 import 'package:riverpod/riverpod.dart';
@@ -13,10 +14,11 @@ final userRepositoryProvider = Provider((ref) {
   return Userrepositoriesimpl(userDataSource: dataSource);
 });
 final userRoleProvider = StateProvider<String?>((ref) => null);
+final currentUserProvider = StateProvider<Usermodel?>((ref) => null);
 
 final userUseCaseProvider = Provider((ref) {
   final repo = ref.watch(userRepositoryProvider);
   return Userusecase(userRepository: repo);
 
-  
+
 });

@@ -1,49 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-
-import '../models/notification_model.dart';
-import '../repository/notification_repository.dart';
-import '../viewmodels/notification_viewmodel.dart';
+import 'package:frontend/application/providers/notification_provider.dart';
+import 'package:frontend/domain/entities/notification_entity.dart';
+import 'package:frontend/presentation/%20viewmodels/notification_stateNotification.dart';
+import 'package:frontend/presentation/components/NotificationDisplayCard.dart';
 import '../widgets/notification_card.dart';
 
-class NotificationScreen extends StatefulWidget {
+class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
+  ConsumerState<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
-
-  late NotificationViewModel viewModel;
-  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
-    viewModel = context.read<NotificationViewModel>();
-    viewModel.fetchNotifications();
 
-    
-    Future.delayed(Duration.zero, () {
-      setState(() {
-        isAdmin = viewModel.getUserRole() == 'admin';
-      });
-    });
-
-    viewModel.notificationCreated.listen((notification) {
-      Fluttertoast.showToast(
-        msg: "Notification '${notification.title}' created!",
-        toastLength: Toast.LENGTH_SHORT,
-      );
+    Future.microtask(() {
+      // Set user ID if needed, e.g., from a user provider
+      final userId = "sample-user-id"; // Replace with actual logic
+      ref.read(notificationNotifierProvider.notifier).setUserId(userId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final notificationsAsync = ref.watch(notificationNotifierProvider);
+    final notifier = ref.read(notificationNotifierProvider.notifier);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Notifications"),
@@ -52,40 +42,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (isAdmin) _buildAdminForm(context),
+            _buildCreateForm(notifier),
             const SizedBox(height: 16),
             Expanded(
-              child: Consumer<NotificationViewModel>(
-                builder: (context, vm, child) {
-                  switch (vm.state) {
-                    case NotificationState.loading:
-                      return const Center(child: CircularProgressIndicator());
-                    case NotificationState.success:
-                      return ListView.builder(
-                        itemCount: vm.notifications.length,
-                        itemBuilder: (context, index) {
-                          final notification = vm.notifications[index];
-                          return NotificationCard(notification: notification);
-                        },
-                      );
-                    case NotificationState.error:
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(vm.errorMessage, style: TextStyle(color: Colors.red)),
-                            ElevatedButton(
-                              onPressed: vm.fetchNotifications,
-                              child: const Text("Retry"),
-                            )
-                          ],
-                        ),
-                      );
-                    case NotificationState.idle:
-                    default:
-                      return const SizedBox.shrink();
-                  }
-                },
+              child: notificationsAsync.when(
+                data: (notifications) => ListView.builder(
+                  itemCount: notifications.length,
+                  itemBuilder: (context, index) {
+                    final notification = notifications[index];
+               return NotificationDisplayCard(notification: notification);
+
+
+                  },
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $e', style: const TextStyle(color: Colors.red)),
+                      ElevatedButton(
+                        onPressed: notifier.getUserNotifications,
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -94,7 +76,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  Widget _buildAdminForm(BuildContext context) {
+  Widget _buildCreateForm(NotificationNotifier notifier) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -135,10 +117,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {
-                viewModel.createNotification(
+              onPressed: () async {
+                await notifier.createNotification(
                   titleController.text,
                   messageController.text,
+                );
+                Fluttertoast.showToast(
+                  msg: "Notification Created!",
+                  toastLength: Toast.LENGTH_SHORT,
                 );
                 titleController.clear();
                 messageController.clear();
@@ -151,4 +137,3 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 }
- 

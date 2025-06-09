@@ -7,19 +7,23 @@ class NotificationRemoteDataSource {
 
   NotificationRemoteDataSource(this.client);
 
-  Future<List<NotificationModel>> getUserNotifications(String userId) async {
-    final response = await client.get(Uri.parse('https:/localhost:5000/api/notification/user/$userId'));
+  Future<List<NotificationModel>> getUserNotifications() async {
+    final response = await client.get(
+        Uri.parse('http://localhost:3500/api/notification/getAllNotification'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return List<NotificationModel>.from(data.map((n) => NotificationModel.fromJson(n)));
+   
+      return List<NotificationModel>.from(
+          data.map((n) => NotificationModel.fromJson(n)));
     } else {
       throw Exception('Failed to load notifications');
     }
   }
 
   Future<void> notifyNewPaper() async {
-    final response = await client.post(Uri.parse('https:/localhost:5000/api/notification/new-paper'));
+    final response = await client
+        .post(Uri.parse('https://localhost:5000/api/notification/new-paper'));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to notify new paper');
@@ -27,7 +31,8 @@ class NotificationRemoteDataSource {
   }
 
   Future<void> notifyInactiveUsers() async {
-    final response = await client.post(Uri.parse('https:/localhost:5000/api/notification/inactive-users'));
+    final response = await client.post(
+        Uri.parse('https:/localhost:5000/api/notification/inactive-users'));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to notify inactive users');
@@ -36,7 +41,7 @@ class NotificationRemoteDataSource {
 
   Future<void> createNotification(String title, String message) async {
     final response = await client.post(
-      Uri.parse('https:/localhost:5000/api/notification'),
+      Uri.parse('http://localhost:3500/api/notification/createNotification'),
       body: jsonEncode({'title': title, 'message': message}),
       headers: {'Content-Type': 'application/json'},
     );

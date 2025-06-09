@@ -10,8 +10,8 @@ class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<List<NotificationEntity>> getUserNotifications(String userId) {
-    return remoteDataSource.getUserNotifications(userId);
+  Future<List<NotificationEntity>> getUserNotifications() {
+    return remoteDataSource.getUserNotifications();
   }
 
   @override

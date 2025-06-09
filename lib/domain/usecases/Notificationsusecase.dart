@@ -7,8 +7,8 @@ class NotificationsUseCase {
   NotificationsUseCase(this.repository);
 
   
-  Future<List<NotificationEntity>> getUserNotifications(String userId) {
-    return repository.getUserNotifications(userId);
+  Future<List<NotificationEntity>> getUserNotifications() {
+    return repository.getUserNotifications();
   }
 
   Future<void> createNotification(String title, String message) {

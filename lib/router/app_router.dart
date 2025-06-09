@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/presentation/pages/notification_screen.dart';
+import 'package:frontend/presentation/pages/userProfile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/presentation/pages/Hompage.dart';
@@ -47,7 +49,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
-        path: '/',
+        path: '/welcome',
         builder: (context, state) => WelcomeScreen(
           onLoginClick: () => context.go('/login'),
           onSignUpClick: () => context.go('/signup'),
@@ -74,6 +76,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/createCategory',
         builder: (context, state) => const CreateCategoryScreen(),
+      ),
+      GoRoute(
+        path: '/Profilepage',
+        builder: (context, state) => const UserProfileScreen(),
+      ),
+      //Notificationpage
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const NotificationScreen(),
       ),
     ],
     debugLogDiagnostics: true, // Helpful for debugging routing issues
