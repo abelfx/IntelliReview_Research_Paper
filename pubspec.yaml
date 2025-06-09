@@ -97,3 +97,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/welcome_page_bg.png
+    - assets/images/welcome_screen_container.png
+    - assets/images/research_paper.png
