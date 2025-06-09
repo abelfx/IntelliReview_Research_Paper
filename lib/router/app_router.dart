@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/presentation/pages/bookmark.dart';
 import 'package:frontend/presentation/pages/commentingpage.dart';
 import 'package:frontend/presentation/pages/notification_screen.dart';
 import 'package:frontend/presentation/pages/posting.dart';
@@ -12,7 +13,6 @@ import 'package:frontend/presentation/pages/createCatagory.dart';
 import 'package:frontend/presentation/pages/login_screen.dart';
 import 'package:frontend/presentation/pages/signup_screen.dart';
 import 'package:frontend/presentation/pages/welcome_screen.dart';
-import 'package:frontend/presentation/pages/posting.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -85,11 +85,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       //Notificationpage
       GoRoute(
         path: '/',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const CommentingPage(),
+        builder: (context, state) => BookmarkScreen(onLogout: () {}),
       ),
     ],
     debugLogDiagnostics: true, // Helpful for debugging routing issues
