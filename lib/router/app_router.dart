@@ -83,10 +83,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const UserProfileScreen(),
       ),
       //Notificationpage
-      GoRoute(
-        path: '/',
-        builder: (context, state) => BookmarkScreen(onLogout: () {}),
-      ),
+      GoRoute(path: '/', builder: (context, state) => HomeScreen()),
     ],
     debugLogDiagnostics: true, // Helpful for debugging routing issues
   );
