@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/review_provider.dart';
-
+import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/model/PaperModel.dart';
 import '../components/homeTopBar.dart';
 import '../components/ResearchPaperCard.dart';
 import '../components/BottomNavBar.dart';
 import '../components/drawer.dart';
 
-import '../../domain/entities/Reviewentities.dart';
-
-
 class CommentingPage extends ConsumerStatefulWidget {
-  const CommentingPage({super.key});
+  final PaperModel paper;
+
+  const CommentingPage({super.key, required this.paper});
 
   @override
   ConsumerState<CommentingPage> createState() => _CommentingPageState();
+
 }
 
 class _CommentingPageState extends ConsumerState<CommentingPage> {
@@ -32,23 +33,23 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
   void _submitComment() {
     final comment = _commentController.text.trim();
     if (comment.isNotEmpty && rating > 0) {
+         final user = ref.watch(currentUserProvider);
       ref.read(reviewNotifierProvider.notifier).createReview(
-        "paper123", 
-        "user123", 
-        rating.toString(),
-        comment,
-      );
+            widget.paper.paperId,
+            user?.id, 
+            rating.toString(),
+            comment,
+          );
 
       _commentController.clear();
-      setState(() {
-        rating = 0;
-      });
+      setState(() => rating = 0);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final reviews = ref.watch(reviewNotifierProvider);
+    
 
     return Scaffold(
       drawer: Drawer(
@@ -94,11 +95,12 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
         child: Column(
           children: [
             ResearchPaperCard(
-              title: "Deep Learning Approaches in Medical Imaging",
-              imageAsset: 'assets/research_paper.png',
-              rating: 4.5,
-              pdfUrl: "https://example.com/sample.pdf",
+              title: widget.paper.title,
+              imageAsset: widget.paper.imageAsset ?? 'assets/research_paper.png',
+              rating: widget.paper.averageRating ?? 0,
+              pdfUrl: widget.paper.pdfUrl,
               isBookmarked: false,
+              onCommentClick: (){},
               onBookmarkClick: () {},
               onReadClick: () {},
               onNavigate: () {},
@@ -106,14 +108,18 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
             const SizedBox(height: 12),
             Card(
               color: const Color(0xFFa9a8db),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     const Text(
                       "What do you think?",
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -123,7 +129,8 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                           onPressed: () => setState(() => rating = i + 1),
                           icon: Icon(
                             Icons.star,
-                            color: (i + 1) <= rating ? Colors.amber : Colors.white,
+                            color:
+                                (i + 1) <= rating ? Colors.amber : Colors.white,
                           ),
                         );
                       }),
@@ -153,7 +160,8 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFECECFB),
                                   borderRadius: BorderRadius.circular(16),
@@ -165,7 +173,8 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                                     const SizedBox(height: 4),
                                     Text(
                                       "Rating: ${review.rating ?? "N/A"}",
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.grey),
                                     ),
                                   ],
                                 ),

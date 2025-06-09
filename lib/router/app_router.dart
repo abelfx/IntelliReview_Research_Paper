@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/model/PaperModel.dart';
+import 'package:frontend/presentation/pages/Hompage.dart';
 import 'package:frontend/presentation/pages/bookmark.dart';
 import 'package:frontend/presentation/pages/commentingpage.dart';
 import 'package:frontend/presentation/pages/notification_screen.dart';
@@ -7,7 +9,6 @@ import 'package:frontend/presentation/pages/posting.dart';
 import 'package:frontend/presentation/pages/userProfile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/pages/Hompage.dart';
 import 'package:frontend/presentation/pages/categoryview.dart';
 import 'package:frontend/presentation/pages/createCatagory.dart';
 import 'package:frontend/presentation/pages/login_screen.dart';
@@ -83,7 +84,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const UserProfileScreen(),
       ),
       //Notificationpage
-      GoRoute(path: '/', builder: (context, state) => HomeScreen()),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const HomeScreen(),
+      ),
+       GoRoute(
+  path: '/commenting',
+  builder: (context, state) {
+    final researchPaper = state.extra as PaperModel;
+    return CommentingPage(paper: researchPaper);
+  },
+),
+
+        builder: (context, state) => BookmarkScreen(onLogout: () {}),
+      ),
     ],
     debugLogDiagnostics: true, // Helpful for debugging routing issues
   );
