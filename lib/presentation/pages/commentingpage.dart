@@ -5,7 +5,7 @@ import 'package:frontend/application/providers/user_provider.dart';
 import 'package:frontend/model/PaperModel.dart';
 import '../components/homeTopBar.dart';
 import '../components/ResearchPaperCard.dart';
-import '../components/BottomNavBar.dart';
+import '../components/app_bottom_nav_bar.dart';
 import '../components/drawer.dart';
 
 class CommentingPage extends ConsumerStatefulWidget {
@@ -15,7 +15,6 @@ class CommentingPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<CommentingPage> createState() => _CommentingPageState();
-
 }
 
 class _CommentingPageState extends ConsumerState<CommentingPage> {
@@ -33,10 +32,10 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
   void _submitComment() {
     final comment = _commentController.text.trim();
     if (comment.isNotEmpty && rating > 0) {
-         final user = ref.watch(currentUserProvider);
+      final user = ref.watch(currentUserProvider);
       ref.read(reviewNotifierProvider.notifier).createReview(
             widget.paper.paperId,
-            user?.id, 
+            user?.id,
             rating.toString(),
             comment,
           );
@@ -49,7 +48,6 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
   @override
   Widget build(BuildContext context) {
     final reviews = ref.watch(reviewNotifierProvider);
-    
 
     return Scaffold(
       drawer: Drawer(
@@ -96,11 +94,12 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
           children: [
             ResearchPaperCard(
               title: widget.paper.title,
-              imageAsset: widget.paper.imageAsset ?? 'assets/research_paper.png',
+              imageAsset:
+                  widget.paper.imageAsset ?? 'assets/research_paper.png',
               rating: widget.paper.averageRating ?? 0,
               pdfUrl: widget.paper.pdfUrl,
               isBookmarked: false,
-              onCommentClick: (){},
+              onCommentClick: () {},
               onBookmarkClick: () {},
               onReadClick: () {},
               onNavigate: () {},

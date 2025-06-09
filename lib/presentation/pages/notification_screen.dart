@@ -50,9 +50,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   itemCount: notifications.length,
                   itemBuilder: (context, index) {
                     final notification = notifications[index];
-               return NotificationDisplayCard(notification: notification);
-
-
+                    return NotificationDisplayCard(notification: notification);
                   },
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -60,7 +58,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Error: $e', style: const TextStyle(color: Colors.red)),
+                      Text('Error: $e',
+                          style: const TextStyle(color: Colors.red)),
                       ElevatedButton(
                         onPressed: notifier.getUserNotifications,
                         child: const Text("Retry"),
@@ -86,18 +85,21 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Title", style: TextStyle(color: Colors.white, fontSize: 23)),
+          const Text("Title",
+              style: TextStyle(color: Colors.white, fontSize: 23)),
           const SizedBox(height: 8),
           TextField(
             controller: titleController,
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFE6E6FA),
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12))),
             ),
           ),
           const SizedBox(height: 24),
-          const Text("Message", style: TextStyle(color: Colors.white, fontSize: 23)),
+          const Text("Message",
+              style: TextStyle(color: Colors.white, fontSize: 23)),
           const SizedBox(height: 8),
           TextField(
             controller: messageController,
@@ -105,7 +107,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
             decoration: const InputDecoration(
               filled: true,
               fillColor: Color(0xFFE6E6FA),
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12))),
             ),
           ),
           const SizedBox(height: 16),
@@ -129,7 +132,8 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                 titleController.clear();
                 messageController.clear();
               },
-              child: const Text("Create", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: const Text("Create",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           )
         ],

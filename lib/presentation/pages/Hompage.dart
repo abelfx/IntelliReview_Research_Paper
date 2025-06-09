@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/presentation/components/BottomNavBar.dart';
+import 'package:frontend/presentation/components/app_bottom_nav_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,6 +16,7 @@ import '../components/homeTopBar.dart';
 import '../components/searchBar.dart';
 import '../components/FilterSortRow.dart';
 import '../components/ResearchPaperCard.dart';
+import "../components/drawer.dart";
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -129,18 +130,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Menu'),
-            ),
-            ListTile(
-              title: const Text('Logout'),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
+        child: DrawerContent(
+          onLogout: () {
+            // Clear shared preferences or do logout logic here
+            // You can also use a provider if you manage auth state
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Logged out successfully')),
+            );
+          },
+          onNavigate: (route) {
+            Navigator.pop(context); // close the drawer
+            context.go(route); // navigate to the selected route
+          },
         ),
       ),
       body: SafeArea(
@@ -210,7 +211,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               extra: paper);
                                         };
                                       },
-                                        onNavigate:(){});
+                                      onNavigate: () {});
                                 },
                               ),
               ),
@@ -218,7 +219,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      
     );
   }
 }

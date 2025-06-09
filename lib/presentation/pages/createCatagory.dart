@@ -8,7 +8,8 @@ class CreateCategoryScreen extends ConsumerStatefulWidget {
   const CreateCategoryScreen({super.key});
 
   @override
-  ConsumerState<CreateCategoryScreen> createState() => _CreateCategoryScreenState();
+  ConsumerState<CreateCategoryScreen> createState() =>
+      _CreateCategoryScreenState();
 }
 
 class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
@@ -29,7 +30,9 @@ class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      await ref.read(categoryNotifierProvider.notifier).addCategory(name, description);
+      await ref
+          .read(categoryNotifierProvider.notifier)
+          .addCategory(name, description);
       Fluttertoast.showToast(msg: "Category '$name' created!");
       _nameController.clear();
       _descriptionController.clear();
@@ -126,7 +129,10 @@ class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
                     )
                   : const Text(
                       "Create",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
             ),
           )

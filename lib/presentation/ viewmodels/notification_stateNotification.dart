@@ -1,9 +1,10 @@
-
 import 'package:frontend/data/models/notification_model.dart';
 import 'package:frontend/domain/entities/notification_entity.dart';
 import 'package:frontend/domain/usecases/Notificationsusecase.dart';
 import 'package:riverpod/riverpod.dart';
-class NotificationNotifier extends StateNotifier<AsyncValue<List<NotificationEntity>>> {
+
+class NotificationNotifier
+    extends StateNotifier<AsyncValue<List<NotificationEntity>>> {
   final NotificationsUseCase notificationUseCase;
 
   NotificationNotifier(this.notificationUseCase) : super(const AsyncLoading()) {

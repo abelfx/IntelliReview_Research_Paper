@@ -1,46 +1,56 @@
-// lib/presentation/viewmodels/bookmark_bloc.dart
+import 'package:frontend/application/providers/category_provider.dart';
+import 'package:frontend/domain/entities/Categoryentities.dart';
+import 'package:frontend/domain/usecases/Categoryusecase.dart';
+import 'package:riverpod/riverpod.dart';
 
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import '../../model/PaperModel.dart';
+class CategoryNotifier
+    extends StateNotifier<AsyncValue<List<Categoryentities>>> {
+  final Categoryusecase categoryUseCase;
 
-part 'bookmark_event.dart';
-part 'bookmark_state.dart';
-
-/// Bloc that manages a list of bookmarked papers.
-class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
-  BookmarkBloc() : super(BookmarkLoadingState()) {
-    on<FetchBookmarksEvent>(_onFetch);
-    on<ToggleBookmarkEvent>(_onToggle);
+  CategoryNotifier(this.categoryUseCase) : super(const AsyncLoading()) {
+    getAllCategories();
   }
 
-  final List<PaperModel> _bookmarks = [];
-
-  Future<void> _onFetch(
-      FetchBookmarksEvent event, Emitter<BookmarkState> emit) async {
-    emit(BookmarkLoadingState());
+  Future<void> getAllCategories() async {
     try {
-      // In a real app you might load from local storage or a DB.
-      await Future.delayed(const Duration(milliseconds: 200));
-      emit(BookmarkLoadedState(List.from(_bookmarks)));
-    } catch (e) {
-      emit(BookmarkErrorState('Failed to load bookmarks: $e'));
+      final categories = await categoryUseCase.getallCategory();
+      state = AsyncData(categories);
+    } catch (e, st) {
+      state = AsyncError(e, st);
     }
   }
 
-  Future<void> _onToggle(
-      ToggleBookmarkEvent event, Emitter<BookmarkState> emit) async {
+  Future<void> addCategory(String name, String description) async {
     try {
-      final paper = event.paper;
-      final index = _bookmarks.indexWhere((p) => p.paperId == paper.paperId);
-      if (index >= 0) {
-        _bookmarks.removeAt(index);
-      } else {
-        _bookmarks.add(paper);
-      }
-      emit(BookmarkLoadedState(List.from(_bookmarks)));
-    } catch (e) {
-      emit(BookmarkErrorState('Failed to toggle bookmark: $e'));
+      await categoryUseCase.createCategory(name, description);
+      await getAllCategories();
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> removeCategory(String id) async {
+    try {
+      await categoryUseCase.deleteCategory(id);
+      await getAllCategories();
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> editCategory(String id, String name, String description) async {
+    try {
+      await categoryUseCase.updateCategory(id, name, description);
+      await getAllCategories();
+    } catch (e, st) {
+      state = AsyncError(e, st);
     }
   }
 }
+
+final categoryNotifierProvider =
+    StateNotifierProvider<CategoryNotifier, AsyncValue<List<Categoryentities>>>(
+        (ref) {
+  final useCase = ref.watch(categoryUseCaseProvider);
+  return CategoryNotifier(useCase);
+});

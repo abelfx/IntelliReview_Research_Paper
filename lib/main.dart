@@ -11,12 +11,11 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Read the GoRouter instance from the provider
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
       title: 'Flutter Demo',
-      routerConfig: router, // Pass the actual GoRouter instance here
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

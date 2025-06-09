@@ -25,10 +25,12 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
   IconData getCategoryIcon(String categoryName) {
     final lowerName = categoryName.toLowerCase();
     return categoryIcons[lowerName] ??
-        categoryIcons.entries.firstWhere(
-          (entry) => lowerName.contains(entry.key),
-          orElse: () => MapEntry('default', Icons.category),
-        ).value;
+        categoryIcons.entries
+            .firstWhere(
+              (entry) => lowerName.contains(entry.key),
+              orElse: () => MapEntry('default', Icons.category),
+            )
+            .value;
   }
 
   void showEditDialog(Categoryentities category) {
@@ -76,42 +78,43 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
     );
   }
 
- void showDeleteDialog(Categoryentities category) {
-  print("Deleting category with ID: '${category.id}'"); // 👈 Log it
+  void showDeleteDialog(Categoryentities category) {
+    print("Deleting category with ID: '${category.id}'"); // 👈 Log it
 
-  if (category.id.trim().isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Invalid category ID")),
+    if (category.id.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid category ID")),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirm Deletion"),
+        content: Text("Are you sure you want to delete '${category.name}'?"),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await ref
+                  .read(categoryNotifierProvider.notifier)
+                  .removeCategory(category.id.trim());
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Category deleted successfully")),
+              );
+            },
+            child: const Text("Delete",
+                style: TextStyle(color: Color(0xFF8786E8))),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
     );
-    return;
   }
-
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: const Text("Confirm Deletion"),
-      content: Text("Are you sure you want to delete '${category.name}'?"),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            Navigator.pop(context);
-            await ref
-                .read(categoryNotifierProvider.notifier)
-                .removeCategory(category.id.trim());
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Category deleted successfully")),
-            );
-          },
-          child: const Text("Delete", style: TextStyle(color: Color(0xFF8786E8))),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
-        ),
-      ],
-    ),
-  );
-}
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +141,9 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
             child: categoryState.when(
               data: (categories) {
                 final filtered = categories
-                    .where((cat) =>
-                        cat.name.toLowerCase().contains(searchQuery.toLowerCase()))
+                    .where((cat) => cat.name
+                        .toLowerCase()
+                        .contains(searchQuery.toLowerCase()))
                     .toList();
 
                 if (filtered.isEmpty) {
@@ -147,7 +151,8 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   itemCount: filtered.length,
                   itemBuilder: (_, i) {
                     final category = filtered[i];
@@ -178,8 +183,8 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: const Color(0xFF8786E8), width: 2),
+                                border: Border.all(
+                                    color: const Color(0xFF8786E8), width: 2),
                               ),
                               child: Icon(
                                 getCategoryIcon(category.name),
@@ -245,8 +250,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                   },
                 );
               },
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),

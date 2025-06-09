@@ -42,7 +42,8 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                   child: CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.grey[300],
-                    child: const Icon(Icons.person, size: 40, color: Colors.grey),
+                    child:
+                        const Icon(Icons.person, size: 40, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -78,8 +79,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
             ),
           ),
           Divider(),
-          SizedBox(height: 40,),
-
+          SizedBox(
+            height: 40,
+          ),
           Container(
             color: const Color(0x100E83),
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -114,62 +116,65 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
     );
   }
 
- Widget _buildStatItem(String value, String label, IconData icon, Color color) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: BoxDecoration(
-      color: Colors.purple[50], // Light purple background
-      borderRadius: BorderRadius.circular(20), // Rounded corners
-      border: Border.all(
-        color: const Color.fromARGB(255, 34, 13, 141).withOpacity(0.3), // Light purple border
-        width: 1,
+  Widget _buildStatItem(
+      String value, String label, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.purple[50], // Light purple background
+        borderRadius: BorderRadius.circular(20), // Rounded corners
+        border: Border.all(
+          color: const Color.fromARGB(255, 34, 13, 141)
+              .withOpacity(0.3), // Light purple border
+          width: 1,
+        ),
       ),
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white, // White circle background
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color.fromARGB(102, 116, 48, 129).withOpacity(0.5),
-                  width: 1,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white, // White circle background
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color.fromARGB(102, 116, 48, 129)
+                        .withOpacity(0.5),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  size: 16,
+                  color: Colors.purple[800], // Dark purple icon
                 ),
               ),
-              child: Icon(
-                icon,
-                size: 16,
-                color: Colors.purple[800], // Dark purple icon
+              const SizedBox(width: 8),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple[800], // Dark purple text
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.purple[800], // Dark purple text
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.purple[600], // Medium purple text
+            ],
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.purple[600], // Medium purple text
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildPostItem(String title) {
     return Container(

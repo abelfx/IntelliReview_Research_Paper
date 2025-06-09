@@ -1,14 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/presentation/pages/adminDashboard.dart';
+import 'package:go_router/go_router.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/application/providers/nav_provider.dart';
+import 'package:frontend/presentation/components/app_bottom_nav_bar.dart';
 import 'package:frontend/model/PaperModel.dart';
+
+// Screens
 import 'package:frontend/presentation/pages/Hompage.dart';
 import 'package:frontend/presentation/pages/bookmark.dart';
 import 'package:frontend/presentation/pages/commentingpage.dart';
 import 'package:frontend/presentation/pages/notification_screen.dart';
 import 'package:frontend/presentation/pages/posting.dart';
 import 'package:frontend/presentation/pages/userProfile.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import 'package:frontend/presentation/pages/categoryview.dart';
 import 'package:frontend/presentation/pages/createCatagory.dart';
 import 'package:frontend/presentation/pages/login_screen.dart';
@@ -19,39 +24,33 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
-      final role = ref.watch(userRoleProvider);
+      final role = ref.read(userRoleProvider);
       final isLoggedIn = role != null;
       final isAuthPage = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/signup';
-      final currentLocation = state.matchedLocation;
-      // If not logged in and not on auth/welcome page, redirect to welcome
-      // 1. Guest (unauthenticated) logic
-      if (!isLoggedIn) {
-        // Allow access to auth/welcome pages
-        if (currentLocation == '/' ||
-            currentLocation == '/login' ||
-            currentLocation == '/signup') {
-          return null;
-        }
-        // Redirect all other pages to welcome
-        return '/';
-      }
+          state.matchedLocation == '/signup' ||
+          state.matchedLocation == '/welcome';
 
-      // 3. User logic
-      if (role == 'user') {
-        return '/viewcategory';
-      } else if (role == 'admin') {
-        return '/createCategory';
-      } else {
-        // Allow access to user routes
+      if (!isLoggedIn) {
+        // If not logged in and trying to access a protected page
+        if (!isAuthPage && state.matchedLocation != '/') {
+          return '/welcome';
+        }
         return null;
       }
 
-      // Fallback (shouldn't normally reach here)
+      // Redirect based on role from root
+      if (state.matchedLocation == '/' && isLoggedIn) {
+        if (role == 'admin') return '/createCategory';
+        if (role == 'user') return '/home';
+      }
+
+      return null; // No redirection
     },
+    debugLogDiagnostics: true,
     routes: [
+      /// Auth and landing routes
       GoRoute(
-        path: '/welcome',
+        path: '/',
         builder: (context, state) => WelcomeScreen(
           onLoginClick: () => context.go('/login'),
           onSignUpClick: () => context.go('/signup'),
@@ -67,38 +66,68 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             SignUpScreen(onLoginClick: () => context.go('/login')),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/viewcategory',
-        builder: (context, state) => const CategoryViewScreen(),
-      ),
-      GoRoute(
-        path: '/createCategory',
-        builder: (context, state) => const CreateCategoryScreen(),
-      ),
-      GoRoute(
-        path: '/Profilepage',
-        builder: (context, state) => const UserProfileScreen(),
-      ),
-      //Notificationpage
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-      ),
-       GoRoute(
-  path: '/commenting',
-  builder: (context, state) {
-    final researchPaper = state.extra as PaperModel;
-    return CommentingPage(paper: researchPaper);
-  },
-),
 
-        builder: (context, state) => BookmarkScreen(onLogout: () {}),
+      /// Shell for nav-bar pages (scaffold wraps these)
+      ShellRoute(
+        builder: (context, state, child) {
+          final currentIndex = ref.read(navIndexProvider);
+          final role = ref.read(userRoleProvider) ?? 'user';
+
+          return Scaffold(
+            body: child,
+            bottomNavigationBar: AppBottomNavBar(
+              selectedIndex: currentIndex,
+              role: role,
+              onItemSelected: (newIndex) {
+                ref.read(navIndexProvider.notifier).state = newIndex;
+                switch (newIndex) {
+                  case 0:
+                    context.go(role == 'admin' ? '/createCategory' : '/home');
+                    break;
+                  case 1:
+                    context.go('/favourites');
+                    break;
+                  case 2:
+                    context.go(
+                        role == 'admin' ? '/notifications' : '/viewcategory');
+                    break;
+                  case 3:
+                    context.go('/post');
+                    break;
+                  case 4:
+                    context.go('/profile');
+                    break;
+                }
+              },
+            ),
+          );
+        },
+        routes: [
+          GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
+          GoRoute(path: '/favourites', builder: (_, __) => const HomeScreen()),
+          GoRoute(
+              path: '/viewcategory',
+              builder: (_, __) => const CategoryViewScreen()),
+          GoRoute(
+              path: '/createCategory',
+              builder: (_, __) => const CreateCategoryScreen()),
+          GoRoute(
+              path: '/notifications',
+              builder: (_, __) => const NotificationScreen()),
+          GoRoute(path: '/post', builder: (_, __) => const PostingScreen()),
+          GoRoute(
+              path: '/profile', builder: (_, __) => const UserProfileScreen()),
+        ],
+      ),
+
+      /// Standalone (non-shell) route with arguments
+      GoRoute(
+        path: '/comment',
+        builder: (context, state) {
+          final paper = state.extra as PaperModel;
+          return CommentingPage(paper: paper);
+        },
       ),
     ],
-    debugLogDiagnostics: true, // Helpful for debugging routing issues
   );
 });
