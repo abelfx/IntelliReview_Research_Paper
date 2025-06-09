@@ -18,7 +18,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/home',
-      builder: (context, state) => const Hompage(),
+      builder: (context, state) => const HomeScreen(),
     ),
     GoRoute(
       path: '/login',
@@ -30,14 +30,13 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) =>
           SignUpScreen(onLoginClick: () => context.go('/login')),
     ),
-     GoRoute(
+    GoRoute(
       path: '/viewcategory',
       builder: (context, state) => const CategoryViewScreen(),
     ),
-     GoRoute(
+    GoRoute(
       path: '/createCategory',
       builder: (context, state) => const CreateCategoryScreen(),
     ),
-    
   ],
 );

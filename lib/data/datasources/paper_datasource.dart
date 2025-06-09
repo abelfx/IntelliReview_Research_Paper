@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/paper_model.dart';
 
 class PaperDataSource {
-  final String baseApi = 'http://localhost:3500/api/papers';
+  final String baseApi = 'http://localhost:3500/api/paper/viewPapers';
 
   Future<PaperModel> uploadPaper({
     required String title,
