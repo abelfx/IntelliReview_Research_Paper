@@ -6,7 +6,7 @@ class Userusecase {
 
   Userusecase({required this.userRepository});
 
-  Future<void> signup(
+  Future<Map<String, dynamic>> signup(
     String name,
     String email,
     String password,

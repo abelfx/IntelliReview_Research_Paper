@@ -53,7 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _login(String email, String password) async {
     final userNotifier = ref.read(userNotifierProvider.notifier);
 
-    await userNotifier.login(email, password, ref);
+    await userNotifier.login(email, password,ref);
     final authStatus = ref.read(userNotifierProvider);
 
     if (mounted) {

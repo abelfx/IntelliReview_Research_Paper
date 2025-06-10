@@ -16,11 +16,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(currentUserProvider);
-    final name = user?.name ?? 'Chaltu Nakew';
-    final email = user?.email ?? 'Chattuvegondar@gmail.com';
-    final role = user?.role ?? 'user';
-    final country = user?.country ?? 'Addis Ababa_Ethiopia';
+   final user = ref.watch(currentUserProvider);
+final name = user?.name ?? 'Chaltu Nakew';
+final email = user?.email ?? 'Chattuvegondar@gmail.com';
+final role = user?.role ?? 'user';
+final country = user?.country ?? 'Addis Ababa_Ethiopia';
+
 
     return Scaffold(
       appBar: AppBar(

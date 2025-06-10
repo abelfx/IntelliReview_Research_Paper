@@ -8,7 +8,7 @@ class Userrepositoriesimpl implements Userrepositories {
   Userrepositoriesimpl({required this.userDataSource});
 
   @override
-  Future<void> signup(
+  Future<Map<String, dynamic>> signup(
     String name,
     String email,
     String password,

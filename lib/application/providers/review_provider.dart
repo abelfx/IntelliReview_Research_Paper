@@ -7,7 +7,6 @@ import 'package:frontend/data/repositories_impl/ReviewRepositoryimpl.dart';
 import 'package:frontend/domain/usecases/reviewusecase.dart';
 import 'package:frontend/domain/entities/Reviewentities.dart';
 
-
 // HTTP Client
 final httpClientProvider = Provider((ref) => http.Client());
 
@@ -26,8 +25,9 @@ final reviewUseCaseProvider = Provider((ref) {
   return RatingUseCase(ref.watch(reviewRepositoryProvider));
 });
 
-// StateNotifierProvider with List<Reviewentities>
+// Notifier
 final reviewNotifierProvider =
-    StateNotifierProvider<ReviewNotifier, List<Reviewentities>>((ref) {
-  return ReviewNotifier(reviewUseCase: ref.watch(reviewUseCaseProvider));
+    StateNotifierProvider<ReviewNotifier, AsyncValue<List<Reviewentities>>>((ref) {
+  final useCase = ref.watch(reviewUseCaseProvider);
+  return ReviewNotifier(reviewUseCase: useCase);
 });

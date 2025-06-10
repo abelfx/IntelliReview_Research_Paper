@@ -1,6 +1,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/data/models/Usermodel.dart';
 import 'package:frontend/domain/usecases/Userusecase.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -13,27 +14,31 @@ class UserNotifier extends StateNotifier<AuthStatus> {
 
  
 
-  Future<void> login(String email, String password, WidgetRef ref) async {
-  state = AuthStatus.loading;
-  try {
-    final result = await userUsecase.login(email, password);
-    final role = result['user']['role']; // assumes backend returns role
-
-    // Set the role in the provider
-    ref.read(userRoleProvider.notifier).state = role;
-
-    state = AuthStatus.authenticated;
-  } catch (e) {
-    state = AuthStatus.error;
+  Future<void> login(String email, String password,WidgetRef ref) async {
+    state = AuthStatus.loading;
+    try {
+      final result = await userUsecase.login(email, password);
+      final userMap = result['user'];
+      final userModel = Usermodel.fromjson(userMap);
+      
+      // Update providers
+      ref.read(currentUserProvider.notifier).state = userModel;
+      ref.read(userRoleProvider.notifier).state = userModel.role;
+      
+      state = AuthStatus.authenticated;
+    } catch (e) {
+      state = AuthStatus.error;
+      rethrow; // Consider rethrowing to handle in UI
+    }
   }
-}
 
 Future<void> signup(String name, String email, String password, String country, String role, WidgetRef ref) async {
   state = AuthStatus.loading;
   try {
-    await userUsecase.signup(name, email, password, country, role);
+    final userMap = await userUsecase.signup(name, email, password, country, role);
+    final userModel = Usermodel.fromjson(userMap); // Ensure this exists
 
-    // Set the role in the provider
+    ref.read(currentUserProvider.notifier).state = userModel;
     ref.read(userRoleProvider.notifier).state = role;
 
     state = AuthStatus.authenticated;
@@ -41,6 +46,7 @@ Future<void> signup(String name, String email, String password, String country, 
     state = AuthStatus.error;
   }
 }
+
 
 }
 
