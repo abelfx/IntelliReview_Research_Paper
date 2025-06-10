@@ -58,13 +58,10 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
       key: _scaffoldKey,
       drawer: Drawer(
         child: DrawerContent(
-          onLogout: () {
-            Navigator.pop(context);
-            // implement logout logic
-          },
+          onLogout: () => context.go('/login'),
           onNavigate: (route) {
             Navigator.pop(context);
-            context.go(route);
+            GoRouter.of(context).go(route);
           },
         ),
       ),
@@ -122,16 +119,49 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
                           final paper =
                               _filteredPapers(paperState.papers)[index];
                           return ResearchPaperCardNorating(
+                            key: ValueKey(paper.id), // Unique key for each item
                             paperId: paper.id,
                             title: paper.title,
                             imageAsset: 'assets/research_paper.png',
                             publishedDate: paper.year.toString(),
                             authorName: paper.authors.join(', '),
+                            // lib/presentation/screens/admin_dashboard.dart
                             onDelete: () async {
-                              await paperNotifier.deletePaper(paper.id);
-                              ref
-                                  .read(adminStatsViewModelProvider)
-                                  .fetchStats();
+                              final scaffold = ScaffoldMessenger.of(context);
+
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: const Text('Delete Paper?'),
+                                  content: Text(
+                                      'Are you sure you want to delete "${paper.title}"?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(dialogContext, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(dialogContext, true),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirmed != true) return;
+
+                              try {
+                                await paperNotifier.deletePaper(paper.id);
+                                ref
+                                    .read(adminStatsViewModelProvider)
+                                    .fetchStats();
+                              } catch (e) {
+                                scaffold.showSnackBar(SnackBar(
+                                    content: Text(
+                                        'Delete failed: ${e.toString()}')));
+                              }
                             },
                           );
                         },

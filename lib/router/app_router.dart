@@ -70,36 +70,41 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       /// Shell for nav-bar pages (scaffold wraps these)
       ShellRoute(
         builder: (context, state, child) {
-          final currentIndex = ref.read(navIndexProvider);
-          final role = ref.read(userRoleProvider) ?? 'user';
+          return Consumer(
+            builder: (context, ref, _) {
+              final currentIndex = ref.watch(navIndexProvider);
+              final role = ref.watch(userRoleProvider) ?? 'user';
 
-          return Scaffold(
-            body: child,
-            bottomNavigationBar: AppBottomNavBar(
-              selectedIndex: currentIndex,
-              role: role,
-              onItemSelected: (newIndex) {
-                ref.read(navIndexProvider.notifier).state = newIndex;
-                switch (newIndex) {
-                  case 0:
-                    context.go(role == 'admin' ? '/admin' : '/home');
-                    break;
-                  case 1:
-                    context.go('/favourites');
-                    break;
-                  case 2:
-                    context.go(
-                        role == 'admin' ? '/notifications' : '/viewcategory');
-                    break;
-                  case 3:
-                    context.go('/post');
-                    break;
-                  case 4:
-                    context.go('/profile');
-                    break;
-                }
-              },
-            ),
+              return Scaffold(
+                body: child,
+                bottomNavigationBar: AppBottomNavBar(
+                  selectedIndex: currentIndex,
+                  role: role,
+                  onItemSelected: (newIndex) {
+                    ref.read(navIndexProvider.notifier).state = newIndex;
+                    switch (newIndex) {
+                      case 0:
+                        context.go(role == 'admin' ? '/admin' : '/home');
+                        break;
+                      case 1:
+                        context.go('/favourites');
+                        break;
+                      case 2:
+                        context.go(role == 'admin'
+                            ? '/notifications'
+                            : '/viewcategory');
+                        break;
+                      case 3:
+                        context.go('/post');
+                        break;
+                      case 4:
+                        context.go('/profile');
+                        break;
+                    }
+                  },
+                ),
+              );
+            },
           );
         },
         routes: [

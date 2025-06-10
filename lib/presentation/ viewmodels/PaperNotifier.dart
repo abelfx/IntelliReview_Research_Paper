@@ -54,17 +54,28 @@ class PaperNotifier extends StateNotifier<PaperState> {
     }
   }
 
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  void _safeUpdate(PaperState newState) {
+    if (!_isDisposed) state = newState;
+  }
+
   Future<void> deletePaper(String id) async {
-    state = state.copyWith(status: PaperStatus.loading, errorMessage: null);
+    _safeUpdate(state.copyWith(status: PaperStatus.loading));
+
     try {
       await useCase.deletePaper(id);
       final updated = await useCase.viewPapers();
-      state = state.copyWith(status: PaperStatus.loaded, papers: updated);
+      _safeUpdate(state.copyWith(status: PaperStatus.loaded, papers: updated));
     } catch (e) {
-      state = state.copyWith(
-        status: PaperStatus.error,
-        errorMessage: e.toString(),
-      );
+      _safeUpdate(state.copyWith(
+          status: PaperStatus.error, errorMessage: e.toString()));
     }
   }
 

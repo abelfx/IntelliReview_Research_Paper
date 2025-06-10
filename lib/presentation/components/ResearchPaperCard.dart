@@ -155,7 +155,7 @@ class ResearchPaperCard extends StatelessWidget {
     final authorsCtl = TextEditingController(text: authorName);
     showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Edit Paper"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -170,12 +170,14 @@ class ResearchPaperCard extends StatelessWidget {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text("Cancel")),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              onEdit(titleCtl.text, authorsCtl.text);
+              Navigator.pop(dialogContext);
+              Future.microtask(() {
+                onEdit(titleCtl.text, authorsCtl.text);
+              });
             },
             child: const Text("Save"),
           ),

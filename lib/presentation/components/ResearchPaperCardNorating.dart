@@ -8,22 +8,17 @@ class ResearchPaperCardNorating extends StatelessWidget {
   final String imageAsset;
   final String publishedDate;
   final String authorName;
-  final VoidCallback onDelete; // make non-nullable
+  final VoidCallback onDelete;
 
   const ResearchPaperCardNorating({
-    super.key,
+    Key? key,
     required this.paperId,
     required this.title,
     required this.imageAsset,
-    this.publishedDate = "Placeholder Date",
-    this.authorName = "Placeholder Author",
-    // default to empty callback so delete icon always shows
-    this.onDelete = _defaultDeleteCallback,
-  });
-
-  static void _defaultDeleteCallback() {
-    // no-op
-  }
+    required this.publishedDate,
+    required this.authorName,
+    required this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +50,7 @@ class ResearchPaperCardNorating extends StatelessWidget {
                 ),
                 // always show delete icon
                 IconButton(
+                  key: ValueKey('delete_[200mpaperId'),
                   icon: const Icon(
                     Icons.delete_outline,
                     color: Colors.white,
@@ -63,17 +59,18 @@ class ResearchPaperCardNorating extends StatelessWidget {
                   onPressed: () async {
                     final confirmed = await showDialog<bool>(
                       context: context,
-                      builder: (_) => AlertDialog(
+                      builder: (dialogContext) => AlertDialog(
                         title: const Text('Delete Paper?'),
                         content:
                             Text('Are you sure you want to delete "$title"?'),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context, false),
+                            onPressed: () =>
+                                Navigator.pop(dialogContext, false),
                             child: const Text('Cancel'),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.pop(context, true),
+                            onPressed: () => Navigator.pop(dialogContext, true),
                             child: const Text('Delete'),
                           ),
                         ],

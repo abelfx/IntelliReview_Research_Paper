@@ -39,7 +39,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Edit Category"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,7 +57,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
         actions: [
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               await ref.read(categoryNotifierProvider.notifier).editCategory(
                     category.id,
                     nameCtrl.text.trim(),
@@ -70,7 +70,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
             child: const Text("Update"),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text("Cancel"),
           ),
         ],
@@ -90,13 +90,13 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Confirm Deletion"),
         content: Text("Are you sure you want to delete '${category.name}'?"),
         actions: [
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               await ref
                   .read(categoryNotifierProvider.notifier)
                   .removeCategory(category.id.trim());
@@ -108,7 +108,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                 style: TextStyle(color: Color(0xFF8786E8))),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text("Cancel"),
           ),
         ],
