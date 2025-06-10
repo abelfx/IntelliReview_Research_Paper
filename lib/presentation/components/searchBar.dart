@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// In searchBar.dart
+
 class CustomSearchBar extends StatelessWidget {
   final String query;
   final ValueChanged<String> onQueryChanged;
@@ -16,10 +16,14 @@ class CustomSearchBar extends StatelessWidget {
       onChanged: onQueryChanged,
       decoration: InputDecoration(
         hintText: 'Search...',
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        prefixIcon: const Icon(Icons.search),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),  // more rounded
+          borderSide: BorderSide.none,              // no border line
+        ),
         filled: true,
-        fillColor: Colors.grey.shade200,
+        fillColor: const Color(0xFFECECFB),         // same background color as dropdown
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
     );
   }
