@@ -73,69 +73,158 @@ class _PostingScreenState extends ConsumerState<PostingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Placeholder image at the top
-          Container(
-            width: double.infinity,
-            height: 200,
-            color: Colors.grey[300],
-            child: Image.asset(
-              'assets/placeholder.png',
-              fit: BoxFit.cover,
-            ),
+          Stack(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 160,
+                color: Colors.grey[300],
+                child: Image.asset(
+                  'assets/images/welcome_page_bg.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 24,
+                child: Text(
+                  'Create a Post',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
 
-          // Existing header + form
+          // header + form
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  // your existing decoration if any
+                  
                   ),
               padding: const EdgeInsets.all(16),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Research Title',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (v) => researchTitle = v,
-                    ),
                     const SizedBox(height: 12),
-                    TextField(
-                      decoration: const InputDecoration(
-                        labelText: 'Authors (comma separated)',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (v) => authorsText = v,
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFECECFB),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 8),
+                          child: Text(
+                            'Research title',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF36454F),
+                            ),
+                          ),
                         ),
-                      ),
-                      value: selectedCategory.isEmpty ? null : selectedCategory,
-                      hint: const Text('Choose category'),
-                      items: categories
-                          .map(
-                              (c) => DropdownMenuItem(value: c, child: Text(c)))
-                          .toList(),
-                      onChanged: (v) => setState(() => selectedCategory = v!),
+                        TextField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFECECFB),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                          onChanged: (v) => researchTitle = v,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 8),
+                          child: Text(
+                            'Description',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF36454F),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          maxLines: 4,
+                          minLines: 3,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFECECFB),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                          onChanged: (v) => authorsText = v,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 8),
+                          child: Text(
+                            'Category',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF36454F),
+                            ),
+                          ),
+                        ),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: const Color(0xFFECECFB),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(24),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                          value: selectedCategory.isEmpty ? null : selectedCategory,
+                          hint: const Text('Choose category'),
+                          items: categories
+                              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                              .toList(),
+                          onChanged: (v) => setState(() => selectedCategory = v!),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton(
                       onPressed: pickPDF,
                       style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
+                        minimumSize: const Size(200, 80),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                      child: Text(
-                        selectedFile == null ? 'Upload PDF' : 'Change PDF',
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            selectedFile == null ? 'Upload PDF' : 'Change PDF',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 8),
+                          const Icon(Icons.upload_file, size: 24),
+                        ],
                       ),
                     ),
                     if (selectedFile != null)
@@ -146,12 +235,25 @@ class _PostingScreenState extends ConsumerState<PostingScreen> {
                         ),
                       ),
                     const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: postPaper,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(50),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: postPaper,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5D5CBB),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(180, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Text(
+                          'POST',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                      child: const Text('POST'),
                     ),
                   ],
                 ),

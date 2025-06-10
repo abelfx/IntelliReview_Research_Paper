@@ -16,36 +16,46 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-   final user = ref.watch(currentUserProvider);
-final name = user?.name ?? 'Chaltu Nakew';
-final email = user?.email ?? 'Chattuvegondar@gmail.com';
-final role = user?.role ?? 'user';
-final country = user?.country ?? 'Addis Ababa_Ethiopia';
-
+    final user = ref.watch(currentUserProvider);
+    final name = user?.name ?? 'Chaltu Nakew';
+    final email = user?.email ?? 'Chaltuvegondar@gmail.com';
+    final role = user?.role ?? 'user';
+    final country = user?.country ?? 'Addis Ababa, Ethiopia';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: const Color.fromARGB(255, 83, 100, 198),
+        backgroundColor: const Color(0xFF5D5CBB),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
           Container(
-            color: const Color.fromARGB(255, 83, 100, 198),
+            color: const Color(0xFF5D5CBB),
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.grey[300],
-                    child:
-                        const Icon(Icons.person, size: 40, color: Colors.grey),
-                  ),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey[300],
+                      child: const Icon(Icons.person, size: 40, color: Colors.grey),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -53,61 +63,78 @@ final country = user?.country ?? 'Addis Ababa_Ethiopia';
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   email,
                   style: TextStyle(
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   role,
                   style: TextStyle(
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  country,
-                  style: TextStyle(
-                    color: Colors.black.withOpacity(0.8),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.white, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      country,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Divider(),
-          SizedBox(
-            height: 40,
-          ),
-          Container(
-            color: const Color(0x100E83),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildStatItem('4.7', 'Avg rates', Icons.star, Colors.orange),
-                _buildStatItem('50+', 'Comments', Icons.comment, Colors.blue),
-                _buildStatItem('10+', 'Posts', Icons.post_add, Colors.green),
-              ],
+          Card(
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            color: const Color(0xFF100E83),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildStatItem('0.0', 'Avg rates', Icons.star, Colors.white),
+                  _buildStatItem('0', 'Comments', Icons.comment, Colors.white),
+                  _buildStatItem('0', 'Posts', Icons.post_add, Colors.white),
+                ],
+              ),
             ),
           ),
           const Padding(
-            padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
-            child: Text(
-              'Recent posts',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(),
+          ),
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+              child: Text(
+                'Recent posts',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
           _buildPostItem(
             'What is the mathematical equation required to be good guy',
           ),
+          const SizedBox(height: 8),
           _buildPostItem(
             'What is the mathematical equation required to be good guy',
           ),
@@ -117,104 +144,119 @@ final country = user?.country ?? 'Addis Ababa_Ethiopia';
     );
   }
 
-  Widget _buildStatItem(
-      String value, String label, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.purple[50], // Light purple background
-        borderRadius: BorderRadius.circular(20), // Rounded corners
-        border: Border.all(
-          color: const Color.fromARGB(255, 34, 13, 141)
-              .withOpacity(0.3), // Light purple border
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.white, // White circle background
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color.fromARGB(102, 116, 48, 129)
-                        .withOpacity(0.5),
-                    width: 1,
-                  ),
-                ),
-                child: Icon(
-                  icon,
-                  size: 16,
-                  color: Colors.purple[800], // Dark purple icon
-                ),
+  Widget _buildStatItem(String value, String label, IconData icon, Color color) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              const SizedBox(width: 8),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.purple[800], // Dark purple text
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.purple[600], // Medium purple text
             ),
+          ],
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.white,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildPostItem(String title) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.deepPurple,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
+    return Card(
+      color: const Color(0xFF5D5CBB),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.grey[300],
+                  child: const Icon(Icons.image, size: 30, color: Colors.grey),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          const Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              'Read',
-              style: TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle read action
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 0),
+                    minimumSize: const Size(0, 32),
+                  ),
+                  child: const Text(
+                    'Read',
+                    style: TextStyle(
+                      color: Color(0xFF5D5CBB),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+                  onPressed: () {
+                    // Handle edit action
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.file_download_outlined, color: Colors.white, size: 20),
+                  onPressed: () {
+                    // Handle download action
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 20),
+                  onPressed: () {
+                    // Handle comment action
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.share, color: Colors.white, size: 20),
+                  onPressed: () {
+                    // Handle share action
+                  },
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
