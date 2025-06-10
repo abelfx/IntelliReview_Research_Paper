@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/application/providers/user_provider.dart';
 
-class DrawerContent extends StatefulWidget {
+class DrawerContent extends ConsumerWidget {
   final void Function() onLogout;
   final Function(String route) onNavigate;
 
@@ -12,37 +13,29 @@ class DrawerContent extends StatefulWidget {
   });
 
   @override
-  State<DrawerContent> createState() => _DrawerContentState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
+    final name = user?.name ?? "Guest User";
+    final email = user?.email ?? "no email";
 
-class _DrawerContentState extends State<DrawerContent> {
-  String name = "Guest User";
-  String email = "no email";
+    final List<_DrawerItem> items = [
+      _DrawerItem(label: "Home", route: "/home", icon: Icons.home_outlined),
+      _DrawerItem(
+          label: "Profile", route: "/profile", icon: Icons.person_outline),
+      _DrawerItem(
+          label: "Bookmark",
+          route: "/favourites",
+          icon: Icons.favorite_border_outlined),
+      _DrawerItem(
+          label: "Create Category",
+          route: "/createCategory",
+          icon: Icons.grid_view_outlined),
+      _DrawerItem(
+          label: "View Category",
+          route: "/grid",
+          icon: Icons.grid_view_outlined),
+    ];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserInfo();
-  }
-
-  Future<void> _loadUserInfo() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      name = prefs.getString('KEY_NAME') ?? "Guest User";
-      email = prefs.getString('KEY_EMAIL') ?? "no email";
-    });
-  }
-
-  final List<_DrawerItem> items = [
-    _DrawerItem(label: "Home", route: "/home", icon: Icons.home_outlined),
-    _DrawerItem(label: "Profile", route: "/profile", icon: Icons.person_outline),
-    _DrawerItem(label: "Bookmark", route: "/favourites", icon: Icons.favorite_border_outlined),
-    _DrawerItem(label: "Create Category", route: "/createCategory", icon: Icons.grid_view_outlined),
-    _DrawerItem(label: "View Category", route: "/grid", icon: Icons.grid_view_outlined),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return SizedBox(
       width: 280,
       child: Column(
@@ -59,11 +52,12 @@ class _DrawerContentState extends State<DrawerContent> {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
-                  backgroundImage: AssetImage('assets/images/welcome_screen_container.png'), // Your image asset here
+                  backgroundImage: AssetImage(
+                      'assets/images/welcome_screen_container.png'), // Your image asset here
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  name.isEmpty ? "Guest User" : name,
+                  name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -71,7 +65,7 @@ class _DrawerContentState extends State<DrawerContent> {
                   ),
                 ),
                 Text(
-                  email.isEmpty ? "no email" : email,
+                  email,
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.white,
@@ -88,9 +82,9 @@ class _DrawerContentState extends State<DrawerContent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ...items.map(
-                        (item) => InkWell(
+                    (item) => InkWell(
                       onTap: () {
-                        widget.onNavigate(item.route);
+                        onNavigate(item.route);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -119,8 +113,9 @@ class _DrawerContentState extends State<DrawerContent> {
                   const Divider(color: Colors.grey, indent: 0, endIndent: 16),
                   InkWell(
                     onTap: () {
-                      widget.onLogout();
-                      widget.onNavigate("/login"); // or however you handle login navigation
+                      onLogout();
+                      onNavigate(
+                          "/login"); // or however you handle login navigation
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),

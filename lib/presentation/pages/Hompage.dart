@@ -77,14 +77,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       key: _scaffoldKey,
       drawer: Drawer(
         child: DrawerContent(
-          onLogout: () {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out successfully')));
-          },
+          onLogout: () => context.go('/login'),
           onNavigate: (route) {
             Navigator.pop(context);
-            context.go(route);
+            GoRouter.of(context).go(route);
           },
         ),
       ),
