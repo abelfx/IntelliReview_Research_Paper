@@ -23,7 +23,7 @@ import 'package:frontend/presentation/pages/welcome_screen.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
-    redirect: (context, state) {
+     redirect: (context, state) {
       final role = ref.read(userRoleProvider);
       final isLoggedIn = role != null;
       final isAuthPage = state.matchedLocation == '/login' ||
@@ -38,10 +38,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      // Redirect based on role from root
-      if (state.matchedLocation == '/' && isLoggedIn) {
-        if (role == 'admin') return '/createCategory';
-        if (role == 'user') return '/home';
+      // If logged in and trying to access auth pages, redirect to appropriate home
+      if (isAuthPage) {
+        return role == 'admin' ? '/admin' : '/home';
+      }
+
+      // For admin users, ensure they can't access user home
+      if (role == 'admin' && state.matchedLocation == '/home') {
+        return '/admin';
       }
 
       return null; // No redirection

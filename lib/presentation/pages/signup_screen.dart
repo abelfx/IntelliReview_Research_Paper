@@ -73,7 +73,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       String country, String role) async {
     final userNotifier = ref.read(userNotifierProvider.notifier);
 
-    await userNotifier.signup(name, email, password, country, role, ref);
+    await userNotifier.signup(name, email, password, country, role);
     final authStatus = ref.read(userNotifierProvider);
 
     if (!mounted) return;
