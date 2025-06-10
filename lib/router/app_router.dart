@@ -51,7 +51,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       /// Auth and landing routes
       GoRoute(
         path: '/',
-        builder: (context, state) => WelcomeScreen(
+        builder: (context, state) => WelcomeScreen
+        (
           onLoginClick: () => context.go('/login'),
           onSignUpClick: () => context.go('/signup'),
         ),

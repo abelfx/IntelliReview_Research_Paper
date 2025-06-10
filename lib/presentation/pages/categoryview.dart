@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/domain/entities/Categoryentities.dart';
 import 'package:frontend/presentation/%20viewmodels/CategoryStateNotifier.dart';
-
-class CategoryViewScreen extends ConsumerStatefulWidget {
+import '../../presentation/components/searchBar.dart';
+class  CategoryViewScreen extends ConsumerStatefulWidget {
   const CategoryViewScreen({super.key});
 
   @override
@@ -126,17 +126,14 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              onChanged: (val) => setState(() => searchQuery = val),
-              decoration: const InputDecoration(
-                labelText: "Search",
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
+         Padding(
+  padding: const EdgeInsets.all(12.0),
+  child: CustomSearchBar(
+    query: searchQuery,
+    onQueryChanged: (val) => setState(() => searchQuery = val),
+  ),
+),
+
           Expanded(
             child: categoryState.when(
               data: (categories) {
@@ -258,4 +255,4 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
       ),
     );
   }
-}
+} 
