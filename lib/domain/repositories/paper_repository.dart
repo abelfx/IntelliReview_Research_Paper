@@ -1,4 +1,5 @@
 // lib/domain/repositories/paper_repository.dart
+
 import '../entities/paper_entity.dart';
 
 abstract class PaperRepository {

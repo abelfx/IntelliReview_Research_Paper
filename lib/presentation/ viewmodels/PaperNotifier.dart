@@ -1,3 +1,4 @@
+// (added updatePaper)
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/paper_entity.dart';
 import '../../domain/usecases/paper_usecase.dart';
@@ -40,23 +41,12 @@ class PaperNotifier extends StateNotifier<PaperState> {
     state = state.copyWith(status: PaperStatus.loading, errorMessage: null);
     try {
       final papers = await useCase.viewPapers();
-
-      // Debug print
-      print('📊 Total papers fetched: ${papers.length}');
-      for (var paper in papers) {
-        print('📄 Paper: ${paper.title}, by ${paper.authors.join(', ')}');
-      }
-
       state = state.copyWith(
         status: PaperStatus.loaded,
         papers: papers,
         errorMessage: null,
       );
-
-      // Debug print after state update
-      print('🔄 State updated to loaded with ${state.papers.length} papers');
     } catch (e) {
-      print('❌ Error fetching papers: $e');
       state = state.copyWith(
         status: PaperStatus.error,
         errorMessage: e.toString(),
@@ -68,7 +58,26 @@ class PaperNotifier extends StateNotifier<PaperState> {
     state = state.copyWith(status: PaperStatus.loading, errorMessage: null);
     try {
       await useCase.deletePaper(id);
-      // after delete, re-fetch list
+      final updated = await useCase.viewPapers();
+      state = state.copyWith(status: PaperStatus.loaded, papers: updated);
+    } catch (e) {
+      state = state.copyWith(
+        status: PaperStatus.error,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  /// NEW: update title + authors, then refresh
+  Future<void> updatePaper(
+    String id,
+    String title,
+    List<String> authors,
+  ) async {
+    state = state.copyWith(status: PaperStatus.loading, errorMessage: null);
+    try {
+      await useCase.updatePaper(
+          id, title, authors, /*year*/ 0, /*category*/ '', null);
       final updated = await useCase.viewPapers();
       state = state.copyWith(status: PaperStatus.loaded, papers: updated);
     } catch (e) {

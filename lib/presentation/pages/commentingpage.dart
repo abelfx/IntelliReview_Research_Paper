@@ -45,7 +45,6 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final reviewsAsync = ref.watch(reviewNotifierProvider);
@@ -94,20 +93,23 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
         child: Column(
           children: [
             ResearchPaperCard(
-              title: widget.paper.title,
-              imageAsset: widget.paper.imageAsset ?? 'assets/research_paper.png',
-              rating: widget.paper.averageRating ?? 0,
-              pdfUrl: widget.paper.pdfUrl,
-              isBookmarked: false,
-              onCommentClick: () {},
-              onBookmarkClick: () {},
-              onReadClick: () {},
-              onNavigate: () {},
-            ),
+                paperId: "0",
+                title: widget.paper.title,
+                imageAsset:
+                    widget.paper.imageAsset ?? 'assets/research_paper.png',
+                rating: widget.paper.averageRating ?? 0,
+                pdfUrl: widget.paper.pdfUrl,
+                isBookmarked: false,
+                onCommentClick: () {},
+                onBookmarkClick: () {},
+                onReadClick: () {},
+                onNavigate: () {},
+                onEdit: (newTitle, newAuthors) async {}),
             const SizedBox(height: 12),
             Card(
               color: const Color(0xFFa9a8db),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -127,7 +129,8 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                           onPressed: () => setState(() => rating = i + 1),
                           icon: Icon(
                             Icons.star,
-                            color: (i + 1) <= rating ? Colors.amber : Colors.white,
+                            color:
+                                (i + 1) <= rating ? Colors.amber : Colors.white,
                           ),
                         );
                       }),
@@ -158,19 +161,22 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFECECFB),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(review.comment),
                                       const SizedBox(height: 4),
                                       Text(
                                         "Rating: ${review.rating ?? "N/A"}",
-                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey),
                                       ),
                                     ],
                                   ),

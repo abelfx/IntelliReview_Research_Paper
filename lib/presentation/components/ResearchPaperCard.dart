@@ -1,7 +1,10 @@
+// lib/presentation/components/ResearchPaperCard.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ResearchPaperCard extends StatelessWidget {
+  final String paperId;
   final String title;
   final String imageAsset;
   final double rating;
@@ -10,11 +13,14 @@ class ResearchPaperCard extends StatelessWidget {
   final VoidCallback onReadClick;
   final VoidCallback onBookmarkClick;
   final VoidCallback onCommentClick;
+  final VoidCallback onNavigate;
+  final Future<void> Function(String newTitle, String newAuthors) onEdit;
   final String publishedDate;
   final String authorName;
 
   const ResearchPaperCard({
     super.key,
+    required this.paperId,
     required this.title,
     required this.imageAsset,
     required this.rating,
@@ -23,9 +29,10 @@ class ResearchPaperCard extends StatelessWidget {
     required this.onCommentClick,
     required this.onReadClick,
     required this.onBookmarkClick,
+    required this.onNavigate,
+    required this.onEdit,
     this.publishedDate = "12/05/2025",
-    this.authorName = "john Bereket",
-    required Null Function() onNavigate,
+    this.authorName = "John Bereket",
   });
 
   @override
@@ -38,6 +45,7 @@ class ResearchPaperCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // Title row with Edit icon
             Row(
               children: [
                 CircleAvatar(
@@ -55,12 +63,18 @@ class ResearchPaperCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  onPressed: () => _showEditDialog(context),
+                ),
               ],
             ),
+
             const SizedBox(height: 4),
             Text("Published: $publishedDate", style: _infoStyle()),
             Text("Author: $authorName", style: _infoStyle()),
             const SizedBox(height: 12),
+
             Row(
               children: [
                 ElevatedButton(
@@ -135,19 +149,51 @@ class ResearchPaperCard extends StatelessWidget {
     );
   }
 
-  TextStyle _infoStyle() => const TextStyle(
-        fontSize: 10,
-        color: Colors.white70,
-      );
+  // Edit dialog
+  void _showEditDialog(BuildContext context) {
+    final titleCtl = TextEditingController(text: title);
+    final authorsCtl = TextEditingController(text: authorName);
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Edit Paper"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+                controller: titleCtl,
+                decoration: const InputDecoration(labelText: "Title")),
+            TextField(
+                controller: authorsCtl,
+                decoration: const InputDecoration(labelText: "Authors")),
+          ],
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel")),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onEdit(titleCtl.text, authorsCtl.text);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  TextStyle _infoStyle() =>
+      const TextStyle(fontSize: 10, color: Colors.white70);
 
   Widget _iconButton(BuildContext context,
       {required IconData icon,
       required String tooltip,
       required VoidCallback onPressed}) {
     return IconButton(
-      icon: Icon(icon, size: 20, color: Colors.white),
-      tooltip: tooltip,
-      onPressed: onPressed,
-    );
+        icon: Icon(icon, size: 20, color: Colors.white),
+        tooltip: tooltip,
+        onPressed: onPressed);
   }
 }
