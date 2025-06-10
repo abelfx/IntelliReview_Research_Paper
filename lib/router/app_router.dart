@@ -82,7 +82,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 ref.read(navIndexProvider.notifier).state = newIndex;
                 switch (newIndex) {
                   case 0:
-                    context.go(role == 'admin' ? '/createCategory' : '/home');
+                    context.go(role == 'admin' ? '/admin' : '/home');
                     break;
                   case 1:
                     context.go('/favourites');
@@ -104,7 +104,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
         routes: [
           GoRoute(path: '/home', builder: (_, __) => HomeScreen()),
-          GoRoute(path: '/favourites', builder: (_, __) => const BookmarkScreen()),
+          GoRoute(
+              path: '/favourites', builder: (_, __) => const BookmarkScreen()),
           GoRoute(
               path: '/viewcategory',
               builder: (_, __) => const CategoryViewScreen()),
@@ -117,6 +118,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/post', builder: (_, __) => const PostingScreen()),
           GoRoute(
               path: '/profile', builder: (_, __) => const UserProfileScreen()),
+          GoRoute(path: '/admin', builder: (_, __) => AdminDashboard()),
         ],
       ),
 

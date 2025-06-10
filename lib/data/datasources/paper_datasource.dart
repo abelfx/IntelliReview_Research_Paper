@@ -5,6 +5,7 @@ import '../models/paper_model.dart';
 
 class PaperDataSource {
   final String baseApi = 'http://localhost:3500/api/paper/viewPapers';
+  final String baseDeleteApi = 'http://localhost:3500/api/paper/delete';
 
   Future<PaperModel> uploadPaper({
     required String title,
@@ -75,7 +76,8 @@ class PaperDataSource {
   }
 
   Future<void> deletePaper(String id) async {
-    final response = await http.delete(Uri.parse('$baseApi/$id'));
+    // use the /delete/:id endpoint
+    final response = await http.delete(Uri.parse('$baseDeleteApi/$id'));
     if (response.statusCode != 200) {
       throw Exception('Delete failed: ${response.body}');
     }

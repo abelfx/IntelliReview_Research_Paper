@@ -63,4 +63,19 @@ class PaperNotifier extends StateNotifier<PaperState> {
       );
     }
   }
+
+  Future<void> deletePaper(String id) async {
+    state = state.copyWith(status: PaperStatus.loading, errorMessage: null);
+    try {
+      await useCase.deletePaper(id);
+      // after delete, re-fetch list
+      final updated = await useCase.viewPapers();
+      state = state.copyWith(status: PaperStatus.loaded, papers: updated);
+    } catch (e) {
+      state = state.copyWith(
+        status: PaperStatus.error,
+        errorMessage: e.toString(),
+      );
+    }
+  }
 }

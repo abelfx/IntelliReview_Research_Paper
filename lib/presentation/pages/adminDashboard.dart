@@ -1,155 +1,144 @@
+// lib/presentation/screens/admin_dashboard.dart
+
 import 'package:flutter/material.dart';
-import 'package:frontend/presentation/components/ResearchPaperCardNorating.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class AdminDashboard extends StatefulWidget {
-  final VoidCallback onLogout;
+import '../components/ResearchPaperCardNorating.dart';
+import '../components/homeTopBar.dart';
+import '../components/searchBar.dart';
+import '../components/drawer.dart';
+import '../../application/providers/paper_provider.dart';
+import '../../application/providers/stats_provider.dart';
+import "../../domain/entities/paper_entity.dart";
 
-  const AdminDashboard({super.key, required this.onLogout});
+class AdminDashboard extends ConsumerStatefulWidget {
+  const AdminDashboard({super.key});
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  ConsumerState<AdminDashboard> createState() => _AdminDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
-  String? selectedFilter;
-  String? selectedSort;
-  String? selectedCategory;
-  String query = "";
-  bool isLoading = false;
-
-  // Mocked stats
-  final int users = 120;
-  final int papers = 45;
+class _AdminDashboardState extends ConsumerState<AdminDashboard> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _fetchStats();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(adminStatsViewModelProvider).fetchStats();
+      ref.read(paperNotifierProvider.notifier).fetchPapers();
+    });
   }
 
-  void _fetchStats() async {
-    setState(() => isLoading = true);
-    await Future.delayed(const Duration(seconds: 1)); // simulate API call
-    setState(() => isLoading = false);
+  List<PaperEntity> _filteredPapers(List<PaperEntity> papers) {
+    if (_searchQuery.isEmpty) return papers;
+    return papers
+        .where(
+            (p) => p.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final statsVm = ref.watch(adminStatsViewModelProvider);
+    final paperState = ref.watch(paperNotifierProvider);
+    final paperNotifier = ref.read(paperNotifierProvider.notifier);
+
+    final isLoading = statsVm.isLoading || paperState.status == "loading";
+
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
       drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF5D5CBB)),
-              child: Text("Admin Panel",
-                  style: TextStyle(color: Colors.white, fontSize: 20)),
-            ),
-            ListTile(
-              title: const Text("Create Notification"),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/create-notification');
-              },
-            ),
-            ListTile(
-              title: const Text("Logout"),
-              onTap: () {
-                Navigator.pop(context);
-                widget.onLogout();
-              },
-            ),
-          ],
+        child: DrawerContent(
+          onLogout: () {
+            Navigator.pop(context);
+            // implement logout logic
+          },
+          onNavigate: (route) {
+            Navigator.pop(context);
+            context.go(route);
+          },
         ),
       ),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF5D5CBB),
-        title: const Text("Admin Dashboard"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () =>
-                Navigator.pushNamed(context, '/create-notification'),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            // Search bar
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Search...",
-                prefixIcon: const Icon(Icons.search),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Top bar with menu & notifications
+              HomeTopBar(
+                onMenuClick: () => _scaffoldKey.currentState?.openDrawer(),
+                inputName: 'Admin Dashboard',
+                onNotificationClick: () {
+                  // handle notifications
+                },
               ),
-              onChanged: (value) => setState(() => query = value),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Mock filter, sort, and category
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                FilterChip(
-                  label: const Text("Filter"),
-                  selected: selectedFilter != null,
-                  onSelected: (_) => setState(() => selectedFilter = "Filter"),
-                ),
-                FilterChip(
-                  label: const Text("Sort"),
-                  selected: selectedSort != null,
-                  onSelected: (_) => setState(() => selectedSort = "Sort"),
-                ),
-                FilterChip(
-                  label: const Text("Category"),
-                  selected: selectedCategory != null,
-                  onSelected: (_) =>
-                      setState(() => selectedCategory = "Category"),
-                ),
-              ],
-            ),
+              // Search bar
+              CustomSearchBar(
+                query: _searchQuery,
+                onQueryChanged: (value) => setState(() => _searchQuery = value),
+              ),
+              const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
-
-            // Stats Cards
-            if (isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
+              // Stats row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildStatCard("Users", users.toString()),
-                  _buildStatCard("Researches", papers.toString()),
+                  _buildStatCard("Users", statsVm.stats!.users.toString()),
+                  _buildStatCard(
+                      "Researches", statsVm.stats!.papers.toString()),
                   _buildStatCard("Comments", "0"),
                 ],
               ),
+              const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
+              // Section title
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Recently Posted",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
 
-            const Text(
-              "Recently Posted",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Use your custom research paper card
-            ResearchPaperCardNorating(
-              title: "Blockchain Applications in Research",
-              imageAsset: "assets/research_paper.png",
-              publishedDate: "2025-01-20",
-              authorName: "Prof. Sara Mekonnen",
-            ),
-            ResearchPaperCardNorating(
-              title: "AI in Modern Research",
-              imageAsset: "assets/research_paper.png",
-              publishedDate: "2025-01-18",
-              authorName: "Dr. Henok Ayele",
-            ),
-          ],
+              // Papers list
+              Expanded(
+                child: _filteredPapers(paperState.papers).isEmpty
+                    ? const Center(child: Text('No papers found'))
+                    : ListView.builder(
+                        itemCount: _filteredPapers(paperState.papers).length,
+                        itemBuilder: (context, index) {
+                          final paper =
+                              _filteredPapers(paperState.papers)[index];
+                          return ResearchPaperCardNorating(
+                            paperId: paper.id,
+                            title: paper.title,
+                            imageAsset: 'assets/research_paper.png',
+                            publishedDate: paper.year.toString(),
+                            authorName: paper.authors.join(', '),
+                            onDelete: () async {
+                              await paperNotifier.deletePaper(paper.id);
+                              ref
+                                  .read(adminStatsViewModelProvider)
+                                  .fetchStats();
+                            },
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -160,7 +149,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Card(
         elevation: 4,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             children: [
               Text(

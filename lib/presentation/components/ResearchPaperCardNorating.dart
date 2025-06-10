@@ -1,19 +1,29 @@
+// lib/presentation/components/ResearchPaperCardNorating.dart
+
 import 'package:flutter/material.dart';
 
-
 class ResearchPaperCardNorating extends StatelessWidget {
+  final String paperId;
   final String title;
   final String imageAsset;
   final String publishedDate;
   final String authorName;
+  final VoidCallback onDelete; // make non-nullable
 
   const ResearchPaperCardNorating({
     super.key,
+    required this.paperId,
     required this.title,
     required this.imageAsset,
     this.publishedDate = "Placeholder Date",
     this.authorName = "Placeholder Author",
+    // default to empty callback so delete icon always shows
+    this.onDelete = _defaultDeleteCallback,
   });
+
+  static void _defaultDeleteCallback() {
+    // no-op
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +35,7 @@ class ResearchPaperCardNorating extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // Title + Avatar + Delete
             Row(
               children: [
                 CircleAvatar(
@@ -42,16 +53,51 @@ class ResearchPaperCardNorating extends StatelessWidget {
                     ),
                   ),
                 ),
+                // always show delete icon
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text('Delete Paper?'),
+                        content:
+                            Text('Are you sure you want to delete "$title"?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirmed == true) {
+                      onDelete();
+                    }
+                  },
+                ),
               ],
             ),
+
             const SizedBox(height: 4),
+
             Text("Published: $publishedDate", style: _infoStyle()),
             Text("Author: $authorName", style: _infoStyle()),
+
             const SizedBox(height: 12),
+
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {}, // leave as-is
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -81,12 +127,11 @@ class ResearchPaperCardNorating extends StatelessWidget {
                   onPressed: () {},
                 ),
                 IconButton(
-                  icon:
-                  const Icon(Icons.share, color: Colors.white, size: 20),
+                  icon: const Icon(Icons.share, color: Colors.white, size: 20),
                   onPressed: () {},
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -94,7 +139,7 @@ class ResearchPaperCardNorating extends StatelessWidget {
   }
 
   TextStyle _infoStyle() => const TextStyle(
-    fontSize: 10,
-    color: Colors.white70,
-  );
+        fontSize: 10,
+        color: Colors.white70,
+      );
 }
