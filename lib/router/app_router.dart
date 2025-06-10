@@ -131,7 +131,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/commenting',
         builder: (context, state) {
-          final paper = state.extra as PaperModel;
+          final paper = (state.extra is PaperModel)
+              ? state.extra as PaperModel
+              : PaperModel(
+                  paperId: 'demo-id',
+                  title: 'Demo Paper',
+                  averageRating: 4.5,
+                  pdfUrl: 'https://example.com/demo.pdf',
+                  publishedDate: '2024-01-01',
+                  authorName: 'Demo Author',
+                  imageAsset: 'assets/avatar_placeholder.png',
+                  category: 'Demo Category',
+                  createdAt: DateTime.now(),
+                );
           return CommentingPage(paper: paper);
         },
       ),

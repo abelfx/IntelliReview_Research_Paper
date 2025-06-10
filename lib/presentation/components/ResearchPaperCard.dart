@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:frontend/model/PaperModel.dart';
+import 'package:frontend/domain/entities/paper_entity.dart';
 
 class ResearchPaperCard extends StatelessWidget {
   final String paperId;
@@ -17,6 +20,7 @@ class ResearchPaperCard extends StatelessWidget {
   final Future<void> Function(String newTitle, String newAuthors) onEdit;
   final String publishedDate;
   final String authorName;
+  final PaperEntity paper;
 
   const ResearchPaperCard({
     super.key,
@@ -33,6 +37,7 @@ class ResearchPaperCard extends StatelessWidget {
     required this.onEdit,
     this.publishedDate = "12/05/2025",
     this.authorName = "John Bereket",
+    required this.paper,
   });
 
   @override
@@ -128,7 +133,20 @@ class ResearchPaperCard extends StatelessWidget {
                   context,
                   icon: Icons.chat_bubble_outline,
                   tooltip: "Comment",
-                  onPressed: onCommentClick,
+                  onPressed: () => context.go(
+                    '/commenting',
+                    extra: PaperModel(
+                      paperId: 'demo-id',
+                      title: 'Demo Paper',
+                      averageRating: 4.5,
+                      pdfUrl: 'https://example.com/demo.pdf',
+                      publishedDate: '2024-01-01',
+                      authorName: 'Demo Author',
+                      imageAsset: 'assets/avatar_placeholder.png',
+                      category: 'Demo Category',
+                      createdAt: DateTime.now(),
+                    ),
+                  ),
                 ),
                 _iconButton(
                   context,

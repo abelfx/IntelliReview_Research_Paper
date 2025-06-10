@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/review_provider.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:frontend/domain/entities/paper_entity.dart';
 import 'package:frontend/model/PaperModel.dart';
 import '../components/homeTopBar.dart';
 import '../components/ResearchPaperCard.dart';
@@ -12,6 +13,21 @@ class CommentingPage extends ConsumerStatefulWidget {
   final PaperModel paper;
 
   const CommentingPage({super.key, required this.paper});
+
+  // Add a named constructor for demo usage
+  factory CommentingPage.demo() => CommentingPage(
+        paper: PaperModel(
+          paperId: 'demo-id',
+          title: 'Demo Paper',
+          averageRating: 4.5,
+          pdfUrl: 'https://example.com/demo.pdf',
+          publishedDate: '2024-01-01',
+          authorName: 'Demo Author',
+          imageAsset: 'assets/avatar_placeholder.png',
+          category: 'Demo Category',
+          createdAt: DateTime.now(),
+        ),
+      );
 
   @override
   ConsumerState<CommentingPage> createState() => _CommentingPageState();
@@ -93,6 +109,14 @@ class _CommentingPageState extends ConsumerState<CommentingPage> {
         child: Column(
           children: [
             ResearchPaperCard(
+                paper: PaperEntity(
+                    id: "ID",
+                    title: "title",
+                    authors: [],
+                    year: 2010,
+                    pdfUrl: "https:/",
+                    uploadedBy: "john B",
+                    category: "machine learning"),
                 paperId: "0",
                 title: widget.paper.title,
                 imageAsset:

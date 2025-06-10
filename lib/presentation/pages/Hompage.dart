@@ -132,6 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             itemBuilder: (context, index) {
                               final paper = filtered[index];
                               return ResearchPaperCard(
+                                paper: paper,
                                 paperId: paper.id,
                                 title: paper.title,
                                 imageAsset: 'assets/avatar_placeholder.png',
