@@ -1,20 +1,34 @@
 // lib/application/providers/notification_provider.dart
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
+
 import 'package:frontend/presentation/%20viewmodels/notification_stateNotification.dart';
-import 'package:http/http.dart' as http;
 import 'package:frontend/data/datasources/notification_remote_data_source.dart';
 import 'package:frontend/data/repositories_impl/notification_repository_impl.dart';
 import 'package:frontend/domain/usecases/Notificationsusecase.dart';
 import 'package:frontend/domain/entities/notification_entity.dart';
 
-/// 1. HTTP Client Provider
-final httpClientProvider = Provider<http.Client>((ref) => http.Client());
+/// 1. Dio Client Provider
+final dioClientProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+
+  // Optional: set base options, interceptors, headers here
+  dio.options = BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  );
+
+  return dio;
+});
 
 /// 2. Remote Data Source Provider
 final notificationRemoteDataSourceProvider = Provider<NotificationRemoteDataSource>((ref) {
-  final client = ref.watch(httpClientProvider);
-  return NotificationRemoteDataSource(client);
+  final dio = ref.watch(dioClientProvider);
+  return NotificationRemoteDataSource(dio);
 });
 
 /// 3. Repository Provider
