@@ -1,17 +1,16 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:frontend/data/models/Categorymodel.dart';
 import 'package:frontend/domain/entities/Categoryentities.dart';
-import 'package:http/http.dart' as http;
 
 class CategoryDataSource {
   final String baseApi = "http://localhost:3500/api/category";
-
+  final Dio _dio = Dio();
 
   Future<List<Categoryentities>> getAllCategory() async {
     try {
-      final response = await http.get(Uri.parse("$baseApi/getallCategory"));
+      final response = await _dio.get("$baseApi/getallCategory");
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List data = response.data;
         return data.map((json) => Categorymodel.fromjson(json)).toList();
       } else {
         throw Exception("Failed to load categories");
@@ -21,15 +20,16 @@ class CategoryDataSource {
     }
   }
 
-
   Future<void> createCategory(String name, String description) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseApi/createCategory'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      final response = await _dio.post(
+        "$baseApi/createCategory",
+        data: {
           'name': name,
           'description': description,
+        },
+        options: Options(headers: {
+          'Content-Type': 'application/json',
         }),
       );
       if (response.statusCode == 201) {
@@ -38,44 +38,42 @@ class CategoryDataSource {
         throw Exception("Failed to create category");
       }
     } catch (error) {
-      print(error);
+      print("Error: $error");
     }
   }
 
+  Future<void> deleteCategory(String id) async {
+    if (id.trim().isEmpty) {
+      throw Exception("Invalid ID: Cannot delete category with empty ID");
+    }
 
- Future<void> deleteCategory(String id) async {
-  if (id.trim().isEmpty) {
-    throw Exception("Invalid ID: Cannot delete category with empty ID");
-  }
-
-  final url = Uri.parse('$baseApi/deleteCategory/${id.trim()}');
-  final response = await http.delete(url);
-
-  if (response.statusCode == 200 || response.statusCode == 204) {
-    print("Deleted successfully");
-  } else {
-    throw Exception("Failed to delete category. Status code: ${response.statusCode}\nResponse: ${response.body}");
-  }
-}
-
-
-
-  
-  Future<Categoryentities> updateCategory(
-      String id, String name, String description) async {
     try {
-      final response = await http.put(
-        Uri.parse('$baseApi/updateCategory/$id'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      final response = await _dio.delete("$baseApi/deleteCategory/${id.trim()}");
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print("Deleted successfully");
+      } else {
+        throw Exception("Failed to delete category. Status code: ${response.statusCode}");
+      }
+    } catch (error) {
+      throw Exception("Delete request failed: $error");
+    }
+  }
+
+  Future<Categoryentities> updateCategory(String id, String name, String description) async {
+    try {
+      final response = await _dio.put(
+        "$baseApi/updateCategory/$id",
+        data: {
           'name': name,
           'description': description,
+        },
+        options: Options(headers: {
+          'Content-Type': 'application/json',
         }),
       );
 
       if (response.statusCode == 200) {
-        final jsonBody = json.decode(response.body);
-        return Categorymodel.fromjson(jsonBody);
+        return Categorymodel.fromjson(response.data);
       } else {
         throw Exception("Failed to update category");
       }

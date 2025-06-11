@@ -1,8 +1,10 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class UserDataSource {
+  final Dio dio;
   final String baseApi = "http://localhost:3500/api/auth";
+
+  UserDataSource(this.dio);
 
   Future<Map<String, dynamic>> signup({
     required String name,
@@ -12,71 +14,56 @@ class UserDataSource {
     required String role,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseApi/signup'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      final response = await dio.post(
+        '$baseApi/signup',
+        data: {
           'name': name,
           'email': email,
           'password': password,
           'country': country,
           'role': role,
-        }),
+        },
       );
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        print("Signup successful: ${data['user']['name']}");
-        return data;
-      } else {
-        final error = jsonDecode(response.body);
-        throw Exception("Signup failed: ${error['error']}");
-      }
-    } catch (error) {
-      print("Error during signup: $error");
-      rethrow;
+      print("Signup successful: ${response.data['user']['name']}");
+      return response.data;
+    } on DioException catch (e) {
+      final error = e.response?.data['error'] ?? e.message;
+      print("Signup failed: $error");
+      throw Exception("Signup failed: $error");
     }
   }
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseApi/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+      final response = await dio.post(
+        '$baseApi/login',
+        data: {'email': email, 'password': password},
       );
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        print("Login successful. Welcome ${data['user']['name']}");
-        return data;
-      } else {
-        final error = jsonDecode(response.body);
-        throw Exception("Login failed: ${error['message'] ?? error['error']}");
-      }
-    } catch (error) {
-      print("Error during login: $error");
-      rethrow;
+      print("Login successful. Welcome ${response.data['user']['name']}");
+      return response.data;
+    } on DioException catch (e) {
+      final error = e.response?.data['message'] ?? e.response?.data['error'] ?? e.message;
+      print("Login failed: $error");
+      throw Exception("Login failed: $error");
     }
   }
-   Future<void> logout() async {
+
+  Future<void> logout() async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseApi/logouut'),
-  
-   );
+      final response = await dio.post('$baseApi/logout');
 
       if (response.statusCode == 201) {
-
-        print("Logout successfully");
-      
+        print("Logout successful");
       } else {
-        final error = jsonDecode(response.body);
-        throw Exception("Logout failed: ${error['message'] ?? error['error']}");
+        final error = response.data['message'] ?? response.data['error'];
+        throw Exception("Logout failed: $error");
       }
-    } catch (error) {
-      print("Error during logout: $error");
-      rethrow;
+    } on DioException catch (e) {
+      final error = e.response?.data['message'] ?? e.response?.data['error'] ?? e.message;
+      print("Logout failed: $error");
+      throw Exception("Logout failed: $error");
     }
   }
 }

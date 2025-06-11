@@ -1,56 +1,57 @@
-// lib/data/datasources/review_remote_data_source.dart
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:frontend/data/models/ReviewModel.dart';
-import 'package:http/http.dart' as http;
 
 class ReviewRemoteDataSource {
-  final http.Client client;
+  final Dio dio;
 
-  ReviewRemoteDataSource(this.client);
+  ReviewRemoteDataSource(this.dio);
 
   Future<void> createRating(
       String paperId, String? userId, String? rating, String comment) async {
-    final body = jsonEncode({
-      'paperId': paperId,
-      'userId': userId,
-      'rating': rating,
-      'comment': comment,
-    });
+    try {
+      final response = await dio.post(
+        'http://localhost:3500/api/review/CreateReview',
+        data: {
+          'paperId': paperId,
+          'userId': userId,
+          'rating': rating,
+          'comment': comment,
+        },
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
 
-    final response = await client.post(
-      Uri.parse('http://localhost:3500/api/review/CreateReview'),
-      headers: {'Content-Type': 'application/json'},
-      body: body,
-    );
-
-    if (response.statusCode != 201) {
-      // Print actual error for debugging
-      print("Create review failed: ${response.body}");
-      throw Exception('Failed to create review');
+      if (response.statusCode != 201) {
+        print("Create review failed: ${response.data}");
+        throw Exception('Failed to create review');
+      }
+    } catch (e) {
+      throw Exception('Create review failed: $e');
     }
   }
 
   Future<List<ReviewModel>> getAllRating() async {
-  final response = await client.get(
-    Uri.parse('http://localhost:3500/api/review/getallReview'),
-    headers: {'Content-Type': 'application/json'},
-  );
+    try {
+      final response = await dio.get(
+        'http://localhost:3500/api/review/getallReview',
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final data = response.data;
 
-    if (data is List) {
-      return data
-          .map((item) => ReviewModel.fromJson(Map<String, dynamic>.from(item)))
-          .toList();
-    } else {
-      throw Exception('Unexpected response format. Expected a list.');
+        if (data is List) {
+          return data
+              .map((item) => ReviewModel.fromJson(Map<String, dynamic>.from(item)))
+              .toList();
+        } else {
+          throw Exception('Unexpected response format. Expected a list.');
+        }
+      } else {
+        print("Get reviews failed: ${response.data}");
+        throw Exception('Failed to load reviews');
+      }
+    } catch (e) {
+      throw Exception('Get reviews failed: $e');
     }
-  } else {
-    print("Get reviews failed: ${response.body}");
-    throw Exception('Failed to load reviews');
   }
-}
-
 }
