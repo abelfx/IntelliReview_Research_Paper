@@ -14,7 +14,7 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'Flutter Demo',
+      title: 'IntelliReview Reserach Paper',
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

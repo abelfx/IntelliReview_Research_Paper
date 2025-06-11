@@ -142,7 +142,7 @@ class ResearchPaperCard extends StatelessWidget {
                       pdfUrl: 'https://example.com/demo.pdf',
                       publishedDate: '2024-01-01',
                       authorName: 'Demo Author',
-                      imageAsset: 'assets/avatar_placeholder.png',
+                      imageAsset: 'assets/images/research_paper.png',
                       category: 'Demo Category',
                       createdAt: DateTime.now(),
                     ),
