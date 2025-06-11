@@ -114,8 +114,7 @@ class DrawerContent extends ConsumerWidget {
                   InkWell(
                     onTap: () {
                       onLogout();
-                      onNavigate(
-                          "/login"); // or however you handle login navigation
+                      onNavigate("/login");
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
