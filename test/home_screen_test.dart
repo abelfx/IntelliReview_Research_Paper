@@ -14,8 +14,21 @@ class MockPaperNotifier extends PaperNotifier {
 
   @override
   Future<void> fetchPapers() async {
-    await Future.delayed(Duration(milliseconds: 100));
-    // No need to change state here since it's already set in the constructor
+    // Simulate fetching papers
+    state = state.copyWith(
+      status: PaperStatus.loaded,
+      papers: [
+        PaperEntity(
+          id: '1',
+          title: 'AI Research',
+          authors: ['John Doe'],
+          year: 2024,
+          pdfUrl: 'https://example.com/ai.pdf',
+          uploadedBy: "author",
+          category: "maths",
+        ),
+      ],
+    );
   }
 }
 
@@ -131,6 +144,7 @@ void main() {
       ),
     );
 
+    // Simulate fetching papers
     await tester.pumpAndSettle();
 
     // Check TopBar text

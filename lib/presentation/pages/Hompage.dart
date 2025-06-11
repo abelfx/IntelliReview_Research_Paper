@@ -136,7 +136,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 paper: paper,
                                 paperId: paper.id,
                                 title: paper.title,
-                                imageAsset: 'assets/avatar_placeholder.png',
+                                imageAsset: 'assets/images/research_paper.png',
                                 rating: 0.0,
                                 pdfUrl: paper.pdfUrl,
                                 isBookmarked:

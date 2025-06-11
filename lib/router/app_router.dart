@@ -23,7 +23,7 @@ import 'package:frontend/presentation/pages/welcome_screen.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
-     redirect: (context, state) {
+    redirect: (context, state) {
       final role = ref.read(userRoleProvider);
       final isLoggedIn = role != null;
       final isAuthPage = state.matchedLocation == '/login' ||
@@ -55,8 +55,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       /// Auth and landing routes
       GoRoute(
         path: '/',
-        builder: (context, state) => WelcomeScreen
-        (
+        builder: (context, state) => WelcomeScreen(
           onLoginClick: () => context.go('/login'),
           onSignUpClick: () => context.go('/signup'),
         ),
@@ -96,11 +95,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         break;
                       case 2:
                         context.go(role == 'admin'
-                            ? '/notifications'
+                            ? '/createCategory'
                             : '/viewcategory');
                         break;
                       case 3:
-                        context.go('/post');
+                        context
+                            .go(role == 'admin' ? '/notifications' : '/post');
                         break;
                       case 4:
                         context.go('/profile');
