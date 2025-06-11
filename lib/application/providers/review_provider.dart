@@ -1,33 +1,42 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/presentation/%20viewmodels/ReviewNotifier.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:dio/dio.dart';
 import 'package:frontend/data/datasources/reviewdatasource.dart';
+import 'package:frontend/presentation/%20viewmodels/ReviewNotifier.dart';
 import 'package:frontend/data/repositories_impl/ReviewRepositoryimpl.dart';
 import 'package:frontend/domain/usecases/reviewusecase.dart';
 import 'package:frontend/domain/entities/Reviewentities.dart';
 
-// HTTP Client
-final httpClientProvider = Provider((ref) => http.Client());
-
-// Data Source
-final reviewRemoteDataSourceProvider = Provider((ref) {
-  return ReviewRemoteDataSource(ref.watch(httpClientProvider));
+/// 1. Dio Client Provider
+final dioClientProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+  dio.options = BaseOptions(
+    connectTimeout: const Duration(seconds: 10),
+    receiveTimeout: const Duration(seconds: 10),
+    headers: {'Content-Type': 'application/json'},
+  );
+  return dio;
 });
 
-// Repository
-final reviewRepositoryProvider = Provider((ref) {
-  return ReviewRepositoryImpl(ref.watch(reviewRemoteDataSourceProvider));
+/// 2. Data Source with Dio
+final reviewRemoteDataSourceProvider = Provider<ReviewRemoteDataSource>((ref) {
+  final dio = ref.watch(dioClientProvider);
+  return ReviewRemoteDataSource(dio);
 });
 
-// Use Case
-final reviewUseCaseProvider = Provider((ref) {
-  return RatingUseCase(ref.watch(reviewRepositoryProvider));
+/// 3. Repository
+final reviewRepositoryProvider = Provider<ReviewRepositoryImpl>((ref) {
+  final remoteDataSource = ref.watch(reviewRemoteDataSourceProvider);
+  return ReviewRepositoryImpl(remoteDataSource);
 });
 
-// Notifier
-final reviewNotifierProvider =
-    StateNotifierProvider<ReviewNotifier, AsyncValue<List<Reviewentities>>>((ref) {
+/// 4. Use Case
+final reviewUseCaseProvider = Provider<RatingUseCase>((ref) {
+  final repository = ref.watch(reviewRepositoryProvider);
+  return RatingUseCase(repository);
+});
+
+/// 5. StateNotifier
+final reviewNotifierProvider = StateNotifierProvider<ReviewNotifier, AsyncValue<List<Reviewentities>>>((ref) {
   final useCase = ref.watch(reviewUseCaseProvider);
   return ReviewNotifier(reviewUseCase: useCase);
 });

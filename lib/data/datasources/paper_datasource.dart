@@ -1,10 +1,11 @@
-// lib/data/datasources/paper_datasource.dart
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '../models/paper_model.dart';
 
 class PaperDataSource {
+  final Dio dio;
+
+  PaperDataSource(this.dio);
+
   final String baseViewApi = 'http://localhost:3500/api/paper/viewPapers';
   final String baseUploadApi = 'http://localhost:3500/api/paper/upload';
   final String baseUpdateApi = 'http://localhost:3500/api/paper/update';
@@ -18,23 +19,29 @@ class PaperDataSource {
     required String category,
     required String filePath,
   }) async {
-    final uri = Uri.parse(baseUploadApi);
-    final request = http.MultipartRequest('POST', uri)
-      ..fields['title'] = title
-      ..fields['authors'] = authors.join(',')
-      ..fields['year'] = year.toString()
-      ..fields['uploadedBy'] = uploadedBy
-      ..fields['category'] = category
-      ..files.add(await http.MultipartFile.fromPath('file', filePath));
+    try {
+      final formData = FormData.fromMap({
+        'title': title,
+        'authors': authors.join(','),
+        'year': year.toString(),
+        'uploadedBy': uploadedBy,
+        'category': category,
+        'file': await MultipartFile.fromFile(filePath),
+      });
 
-    final streamed = await request.send();
-    final response = await http.Response.fromStream(streamed);
+      final response = await dio.post(
+        baseUploadApi,
+        data: formData,
+      );
 
-    if (response.statusCode == 201) {
-      final data = jsonDecode(response.body)['paper'];
-      return PaperModel.fromJson(data);
-    } else {
-      throw Exception('Upload failed: ${response.body}');
+      if (response.statusCode == 201) {
+        final data = response.data['paper'];
+        return PaperModel.fromJson(data);
+      } else {
+        throw Exception('Upload failed: ${response.data}');
+      }
+    } catch (e) {
+      throw Exception('Upload failed: $e');
     }
   }
 
@@ -46,42 +53,55 @@ class PaperDataSource {
     required String category,
     String? filePath,
   }) async {
-    final uri = Uri.parse('$baseUpdateApi/$id');
-    final request = http.MultipartRequest('PUT', uri)
-      ..fields['title'] = title
-      ..fields['authors'] = authors.join(',')
-      ..fields['year'] = year.toString()
-      ..fields['category'] = category;
+    try {
+      final formData = FormData.fromMap({
+        'title': title,
+        'authors': authors.join(','),
+        'year': year.toString(),
+        'category': category,
+        if (filePath != null)
+          'file': await MultipartFile.fromFile(filePath),
+      });
 
-    if (filePath != null) {
-      request.files.add(await http.MultipartFile.fromPath('file', filePath));
-    }
+      final response = await dio.put(
+        '$baseUpdateApi/$id',
+        data: formData,
+      );
 
-    final streamed = await request.send();
-    final response = await http.Response.fromStream(streamed);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['paper'];
-      return PaperModel.fromJson(data);
-    } else {
-      throw Exception('Update failed: ${response.body}');
+      if (response.statusCode == 200) {
+        final data = response.data['paper'];
+        return PaperModel.fromJson(data);
+      } else {
+        throw Exception('Update failed: ${response.data}');
+      }
+    } catch (e) {
+      throw Exception('Update failed: $e');
     }
   }
 
   Future<List<PaperModel>> viewPapers() async {
-    final response = await http.get(Uri.parse(baseViewApi));
-    if (response.statusCode == 200) {
-      final List jsonList = jsonDecode(response.body);
-      return jsonList.map((e) => PaperModel.fromJson(e)).toList();
-    } else {
-      throw Exception('Fetch failed: ${response.body}');
+    try {
+      final response = await dio.get(baseViewApi);
+
+      if (response.statusCode == 200) {
+        final List data = response.data;
+        return data.map((e) => PaperModel.fromJson(e)).toList();
+      } else {
+        throw Exception('Fetch failed: ${response.data}');
+      }
+    } catch (e) {
+      throw Exception('Fetch failed: $e');
     }
   }
 
   Future<void> deletePaper(String id) async {
-    final response = await http.delete(Uri.parse('$baseDeleteApi/$id'));
-    if (response.statusCode != 200) {
-      throw Exception('Delete failed: ${response.body}');
+    try {
+      final response = await dio.delete('$baseDeleteApi/$id');
+      if (response.statusCode != 200) {
+        throw Exception('Delete failed: ${response.data}');
+      }
+    } catch (e) {
+      throw Exception('Delete failed: $e');
     }
   }
 }

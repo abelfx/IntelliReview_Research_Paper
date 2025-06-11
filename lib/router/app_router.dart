@@ -38,10 +38,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      // Redirect based on role from root
-      if (state.matchedLocation == '/' && isLoggedIn) {
-        if (role == 'admin') return '/createCategory';
-        if (role == 'user') return '/home';
+      // If logged in and trying to access auth pages, redirect to appropriate home
+      if (isAuthPage) {
+        return role == 'admin' ? '/admin' : '/home';
+      }
+
+      // For admin users, ensure they can't access user home
+      if (role == 'admin' && state.matchedLocation == '/home') {
+        return '/admin';
       }
 
       return null; // No redirection
@@ -51,8 +55,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       /// Auth and landing routes
       GoRoute(
         path: '/',
-        builder: (context, state) => WelcomeScreen
-        (
+        builder: (context, state) => WelcomeScreen(
           onLoginClick: () => context.go('/login'),
           onSignUpClick: () => context.go('/signup'),
         ),
@@ -92,11 +95,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                         break;
                       case 2:
                         context.go(role == 'admin'
-                            ? '/notifications'
+                            ? '/createCategory'
                             : '/viewcategory');
                         break;
                       case 3:
-                        context.go('/post');
+                        context
+                            .go(role == 'admin' ? '/notifications' : '/post');
                         break;
                       case 4:
                         context.go('/profile');

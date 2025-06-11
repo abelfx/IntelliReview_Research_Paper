@@ -13,6 +13,8 @@ import '../../presentation/components/searchBar.dart';
 import '../../presentation/components/FilterSortRow.dart';
 import '../../presentation/components/ResearchPaperCard.dart';
 import '../../presentation/components/drawer.dart';
+import "../../presentation/ viewmodels/bookmark_provider.dart";
+import "../../model/PaperModel.dart";
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +27,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _searchQuery = '';
   String _selectedFilter = 'All';
   String _selectedSort = 'Name';
-  final Set<String> _bookmarkedIds = {};
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -42,7 +43,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             (p) => p.title.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
     if (_selectedFilter == 'Favorites') {
-      filtered = filtered.where((p) => _bookmarkedIds.contains(p.id)).toList();
+      final bookmarks = ref.watch(bookmarkNotifierProvider);
+      filtered = filtered
+          .where((p) => bookmarks.any((b) => b.paperId == p.id))
+          .toList();
     }
     // you could also sort here based on _selectedSort if desired
     return filtered;
@@ -70,6 +74,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(paperNotifierProvider);
     final notifier = ref.read(paperNotifierProvider.notifier);
+    final bookmarks = ref.watch(bookmarkNotifierProvider);
 
     final filtered = _filterPapers(state.papers);
 
@@ -77,14 +82,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       key: _scaffoldKey,
       drawer: Drawer(
         child: DrawerContent(
-          onLogout: () {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out successfully')));
-          },
+          onLogout: () => context.go('/login'),
           onNavigate: (route) {
             Navigator.pop(context);
-            context.go(route);
+            GoRouter.of(context).go(route);
           },
         ),
       ),
@@ -135,25 +136,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 paper: paper,
                                 paperId: paper.id,
                                 title: paper.title,
-                                imageAsset: 'assets/avatar_placeholder.png',
+                                imageAsset: 'assets/images/research_paper.png',
                                 rating: 0.0,
                                 pdfUrl: paper.pdfUrl,
-                                isBookmarked: _bookmarkedIds.contains(paper.id),
+                                isBookmarked:
+                                    bookmarks.any((b) => b.paperId == paper.id),
                                 publishedDate: paper.year.toString(),
                                 authorName: paper.authors.join(', '),
                                 onReadClick: () => _openPdf(paper.pdfUrl),
-                                onBookmarkClick: () => setState(() {
-                                  if (_bookmarkedIds.contains(paper.id)) {
-                                    _bookmarkedIds.remove(paper.id);
-                                  } else {
-                                    _bookmarkedIds.add(paper.id);
-                                  }
-                                }),
+                                onBookmarkClick: () {
+                                  final paperModel = PaperModel(
+                                    paperId: paper.id,
+                                    title: paper.title,
+                                    averageRating: 0.0,
+                                    pdfUrl: paper.pdfUrl,
+                                    publishedDate: paper.year.toString(),
+                                    authorName: paper.authors.join(', '),
+                                    imageAsset: 'assets/avatar_placeholder.png',
+                                    category: 'Default Category',
+                                    createdAt: DateTime.now(),
+                                  );
+
+                                  ref
+                                      .read(bookmarkNotifierProvider.notifier)
+                                      .toggleBookmark(paperModel);
+                                },
                                 onCommentClick: () =>
                                     context.go('/commenting', extra: paper),
                                 onNavigate: () {/* your navigation logic */},
                                 onEdit: (newTitle, newAuthors) async {
-                                  // call your updatePaper use-case & then refresh
                                   await notifier.updatePaper(
                                     paper.id,
                                     newTitle,

@@ -48,7 +48,7 @@ class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
       alignment: Alignment.bottomLeft,
       children: [
         Image.asset(
-          'assets/welcome_page_cropedbg.png',
+          'assets/images/welcome_page_bg.png',
           width: double.infinity,
           height: 300,
           fit: BoxFit.cover,
