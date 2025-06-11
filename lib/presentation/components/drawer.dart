@@ -107,10 +107,10 @@ void _pickImage() async {
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white, width: 2),
           ),
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(4),
           child: const Icon(
             Icons.camera_alt,
-            size: 20,
+            size: 16,
             color: Colors.white,
           ),
         ),
