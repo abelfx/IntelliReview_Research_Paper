@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
 
-class DrawerContent extends ConsumerWidget {
+class DrawerContent extends  ConsumerStatefulWidget  {
   final VoidCallback onLogout;
   final void Function(String route) onNavigate;
   
@@ -15,8 +19,37 @@ class DrawerContent extends ConsumerWidget {
    
   });
 
+    @override
+  ConsumerState<DrawerContent> createState() => _DrawerContentState();
+}
+
+class _DrawerContentState extends ConsumerState<DrawerContent> {
+  File? _profileImage;
+  Uint8List? _webImage;
+
+void _pickImage() async {
+  final ImagePicker picker = ImagePicker();
+
+  if (kIsWeb) {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _webImage = bytes;
+      });
+    }
+  } else {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+}
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context,) {
     final user = ref.watch(currentUserProvider);
     final name = user?.name ?? "Guest User";
     final email = user?.email ?? "no email";
@@ -52,12 +85,40 @@ class DrawerContent extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white,
-                  backgroundImage:
-                      AssetImage('assets/images/profile_img.png'),
-                ),
+                Stack(
+  children: [
+    CircleAvatar(
+      radius: 40,
+      backgroundColor: Colors.white,
+      backgroundImage: _profileImage != null
+          ? FileImage(_profileImage!)
+          : (_webImage != null
+              ? MemoryImage(_webImage!)
+              : AssetImage('assets/images/profile_img.png')) as ImageProvider,
+    ),
+    Positioned(
+      bottom: 0,
+      right: 0,
+      child: InkWell(
+        onTap: _pickImage,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.blueAccent,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          padding: const EdgeInsets.all(6),
+          child: const Icon(
+            Icons.camera_alt,
+            size: 20,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    ),
+  ],
+),
+
                 const SizedBox(height: 12),
                 Text(name,
                     style: const TextStyle(
@@ -78,7 +139,7 @@ class DrawerContent extends ConsumerWidget {
                 children: [
                   for (final item in items)
                     InkWell(
-                      onTap: () => onNavigate(item.route),
+                      onTap: () => widget.onNavigate(item.route),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Row(
@@ -100,9 +161,10 @@ class DrawerContent extends ConsumerWidget {
                   InkWell(
                     key: const Key('drawer_logout'),
                     onTap: () {
+                      widget.onLogout();
                       ref.read(userRoleProvider.notifier).state = null;
                       ref.read(currentUserProvider.notifier).state = null;
-                      onLogout(); // optional callback to parent
+                     // optional callback to parent
                       GoRouter.of(context).go('/login');
                     },
                     child: Padding(
