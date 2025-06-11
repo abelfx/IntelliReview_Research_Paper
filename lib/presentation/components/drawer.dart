@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class DrawerContent extends ConsumerWidget {
-  final void Function() onLogout;
-  final Function(String route) onNavigate;
+  final VoidCallback onLogout;
+  final void Function(String route) onNavigate;
 
   const DrawerContent({
     super.key,
@@ -20,7 +20,7 @@ class DrawerContent extends ConsumerWidget {
     final name = user?.name ?? "Guest User";
     final email = user?.email ?? "no email";
 
-    final List<_DrawerItem> items = [
+    final items = <_DrawerItem>[
       _DrawerItem(label: "Home", route: "/home", icon: Icons.home_outlined),
       _DrawerItem(
           label: "Profile", route: "/profile", icon: Icons.person_outline),
@@ -35,8 +35,7 @@ class DrawerContent extends ConsumerWidget {
       _DrawerItem(
           label: "View Category",
           route: "/viewcategory",
-          icon: Icons.grid_view_outlined),
-         
+          icon: Icons.view_list_outlined),
     ];
 
     return SizedBox(
@@ -52,28 +51,20 @@ class DrawerContent extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
                   backgroundImage:
                       AssetImage('assets/images/welcome_screen_container.png'),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  email,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
+                Text(name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white)),
+                Text(email,
+                    style: const TextStyle(fontSize: 14, color: Colors.white)),
               ],
             ),
           ),
@@ -84,72 +75,51 @@ class DrawerContent extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ...items.map(
-                    (item) => InkWell(
-                      onTap: () {
-                        onNavigate(item.route);
-                      },
+                  for (final item in items)
+                    InkWell(
+                      onTap: () => onNavigate(item.route),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Row(
                           children: [
-                            Icon(
-                              item.icon,
-                              size: 23,
-                              color: const Color(0xFF36454F),
-                            ),
+                            Icon(item.icon,
+                                size: 23, color: const Color(0xFF36454F)),
                             const SizedBox(width: 12),
-                            Text(
-                              item.label,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF36454F),
-                              ),
-                            ),
+                            Text(item.label,
+                                style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF36454F))),
                           ],
                         ),
                       ),
                     ),
-                  ),
                   const Spacer(),
                   const Divider(color: Colors.grey, indent: 0, endIndent: 16),
                   InkWell(
-                    onTap: () async {
-                      onLogout();
-
-                      Fluttertoast.showToast(
-                        msg: "Logout successful",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        backgroundColor: Colors.black87,
-                        textColor: Colors.white,
-                      );
-
-                      context.go('/signup');
+                    key: const Key('drawer_logout'),
+                    onTap: () {
+                      ref.read(userRoleProvider.notifier).state = null;
+                      ref.read(currentUserProvider.notifier).state = null;
+                      onLogout(); // optional callback to parent
+                      GoRouter.of(context).go('/login');
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Row(
                         children: const [
-                          Icon(
-                            Icons.logout_outlined,
-                            size: 23,
-                            color: Color(0xFF36454F),
-                          ),
+                          Icon(Icons.logout_outlined,
+                              size: 23, color: Color(0xFF36454F)),
                           SizedBox(width: 12),
-                          Text(
-                            "Logout",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF36454F),
-                            ),
-                          ),
+                          Text("Logout",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF36454F))),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -164,10 +134,5 @@ class _DrawerItem {
   final String label;
   final String route;
   final IconData icon;
-
-  _DrawerItem({
-    required this.label,
-    required this.route,
-    required this.icon,
-  });
+  _DrawerItem({required this.label, required this.route, required this.icon});
 }

@@ -58,19 +58,9 @@ class _AdminDashboardState extends ConsumerState<AdminDashboard> {
       key: _scaffoldKey,
       drawer: Drawer(
         child: DrawerContent(
-          onLogout: () async {
-            try {
-              // Navigate to login
-              context.go('/login');
-            } catch (e) {
-              // Show an error message if logout fails
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Logout failed: ${e.toString()}'),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
+          onLogout: () {
+            // Directly navigate to the login page
+            context.go('/login');
           },
           onNavigate: (route) {
             Navigator.pop(context);
