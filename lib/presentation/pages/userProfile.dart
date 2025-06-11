@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
 class UserProfileScreen extends ConsumerStatefulWidget {
   const UserProfileScreen({super.key});
 
@@ -10,9 +13,29 @@ class UserProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
-  void _pickImage() async {
-    // Stub for image picker
+  File? _profileImage;
+Uint8List? _webImage;
+
+void _pickImage() async {
+  final ImagePicker picker = ImagePicker();
+
+  if (kIsWeb) {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _webImage = bytes;
+      });
+    }
+  } else {
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +61,34 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
               children: [
                 Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey[300],
-                      child: const Icon(Icons.person, size: 40, color: Colors.grey),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
-                      ),
-                    ),
+                 CircleAvatar(
+  radius: 40,
+  backgroundColor: Colors.grey[300],
+  backgroundImage: _profileImage != null
+      ? FileImage(_profileImage!)
+      : (_webImage != null
+          ? MemoryImage(_webImage!)
+          : AssetImage('assets/images/profile_img.png') as ImageProvider),
+),
+
+
+
+                   Positioned(
+  bottom: 0,
+  right: 0,
+  child: GestureDetector(
+    onTap: _pickImage,
+    child: Container(
+      padding: const EdgeInsets.all(4),
+      decoration: const BoxDecoration(
+        color: Colors.blue,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+    ),
+  ),
+),
+
                   ],
                 ),
                 const SizedBox(height: 16),

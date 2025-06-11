@@ -33,7 +33,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!isLoggedIn) {
         // If not logged in and trying to access a protected page
         if (!isAuthPage && state.matchedLocation != '/') {
-          return '/welcome';
+          return '/home';
         }
         return null;
       }
@@ -55,10 +55,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       /// Auth and landing routes
       GoRoute(
         path: '/',
-        builder: (context, state) => WelcomeScreen(
-          onLoginClick: () => context.go('/login'),
-          onSignUpClick: () => context.go('/signup'),
-        ),
+        builder: (context, state) => HomeScreen()
+        //  onLoginClick: () => context.go('/login'),
+         // onSignUpClick: () => context.go('/signup'),
+       // ),
       ),
       GoRoute(
         path: '/login',

@@ -7,11 +7,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 class DrawerContent extends ConsumerWidget {
   final VoidCallback onLogout;
   final void Function(String route) onNavigate;
-
+  
   const DrawerContent({
     super.key,
     required this.onLogout,
     required this.onNavigate,
+   
   });
 
   @override
@@ -55,7 +56,7 @@ class DrawerContent extends ConsumerWidget {
                   radius: 40,
                   backgroundColor: Colors.white,
                   backgroundImage:
-                      AssetImage('assets/images/welcome_screen_container.png'),
+                      AssetImage('assets/images/profile_img.png'),
                 ),
                 const SizedBox(height: 12),
                 Text(name,
