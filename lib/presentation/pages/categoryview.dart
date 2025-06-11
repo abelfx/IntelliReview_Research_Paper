@@ -156,7 +156,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: Colors.purple[100],
+                        color: const Color(0xFF5D5CBB),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -167,7 +167,7 @@ class _CategoryViewScreenState extends ConsumerState<CategoryViewScreen> {
                           ),
                         ],
                         border: Border.all(
-                          color: Colors.purple.withOpacity(0.2),
+                          color: const Color(0xFF5D5CBB),
                           width: 1,
                         ),
                       ),
