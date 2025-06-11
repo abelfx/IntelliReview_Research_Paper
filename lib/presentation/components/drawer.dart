@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/application/providers/user_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DrawerContent extends ConsumerWidget {
   final void Function() onLogout;
@@ -32,8 +34,9 @@ class DrawerContent extends ConsumerWidget {
           icon: Icons.grid_view_outlined),
       _DrawerItem(
           label: "View Category",
-          route: "/grid",
+          route: "/viewcategory",
           icon: Icons.grid_view_outlined),
+         
     ];
 
     return SizedBox(
@@ -52,8 +55,8 @@ class DrawerContent extends ConsumerWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
-                  backgroundImage: AssetImage(
-                      'assets/images/welcome_screen_container.png'), // Your image asset here
+                  backgroundImage:
+                      AssetImage('assets/images/welcome_screen_container.png'),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -112,9 +115,18 @@ class DrawerContent extends ConsumerWidget {
                   const Spacer(),
                   const Divider(color: Colors.grey, indent: 0, endIndent: 16),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
                       onLogout();
-                      onNavigate("/login");
+
+                      Fluttertoast.showToast(
+                        msg: "Logout successful",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.black87,
+                        textColor: Colors.white,
+                      );
+
+                      context.go('/signup');
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
